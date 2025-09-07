@@ -5,7 +5,7 @@
 namespace BLBM_Env.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class RicherConnectionModel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -65,21 +65,20 @@ namespace BLBM_Env.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SourceDeviceID = table.Column<int>(type: "int", nullable: true),
                     TargetDeviceID = table.Column<int>(type: "int", nullable: true),
-                    Source_DeviceName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Source_Tur = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Source_Model = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Source_ServiceTag = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Source_IpAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Source_Port = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Target_DeviceName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Target_Tur = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Target_Model = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Target_ServiceTag = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Target_IpAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Source_LinkStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Source_LinkSpeed = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Source_NicID = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Source_FiberMAC = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Source_BakirMAC = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Source_WWPN = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Target_Port = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ConnectionType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LinkStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LinkSpeed = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Target_LinkStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Target_LinkSpeed = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Target_FiberMAC = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Target_BakirMAC = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Target_WWPN = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConnectionType = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -98,41 +97,6 @@ namespace BLBM_Env.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "EnvanterDetails",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EnvanterID = table.Column<int>(type: "int", nullable: false),
-                    Turu = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeviceName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeviceServiceTag = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeviceModel = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Lok = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LinkStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LinkSpeed = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PortID = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NicID = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FiberMAC = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BakirMAC = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WWPN = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SwName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SwPort = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SwModel = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SwServiceTag = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EnvanterDetails", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_EnvanterDetails_Envanterler_EnvanterID",
-                        column: x => x.EnvanterID,
-                        principalTable: "Envanterler",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Baglantilar_SourceDeviceID",
                 table: "Baglantilar",
@@ -142,11 +106,6 @@ namespace BLBM_Env.Migrations
                 name: "IX_Baglantilar_TargetDeviceID",
                 table: "Baglantilar",
                 column: "TargetDeviceID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EnvanterDetails_EnvanterID",
-                table: "EnvanterDetails",
-                column: "EnvanterID");
         }
 
         /// <inheritdoc />
@@ -154,9 +113,6 @@ namespace BLBM_Env.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Baglantilar");
-
-            migrationBuilder.DropTable(
-                name: "EnvanterDetails");
 
             migrationBuilder.DropTable(
                 name: "Vips");

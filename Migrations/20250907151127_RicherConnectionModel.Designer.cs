@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BLBM_Env.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250905084645_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250907151127_RicherConnectionModel")]
+    partial class RicherConnectionModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,54 +35,51 @@ namespace BLBM_Env.Migrations
                     b.Property<string>("ConnectionType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LinkSpeed")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LinkStatus")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("SourceDeviceID")
                         .HasColumnType("int");
 
-                    b.Property<string>("Source_DeviceName")
+                    b.Property<string>("Source_BakirMAC")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Source_IpAddress")
+                    b.Property<string>("Source_FiberMAC")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Source_Model")
+                    b.Property<string>("Source_LinkSpeed")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Source_LinkStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Source_NicID")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Source_Port")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Source_ServiceTag")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Source_Tur")
+                    b.Property<string>("Source_WWPN")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("TargetDeviceID")
                         .HasColumnType("int");
 
-                    b.Property<string>("Target_DeviceName")
+                    b.Property<string>("Target_BakirMAC")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Target_IpAddress")
+                    b.Property<string>("Target_FiberMAC")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Target_Model")
+                    b.Property<string>("Target_LinkSpeed")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Target_LinkStatus")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Target_Port")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Target_ServiceTag")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Target_Tur")
+                    b.Property<string>("Target_WWPN")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
@@ -148,72 +145,6 @@ namespace BLBM_Env.Migrations
                     b.ToTable("Envanterler");
                 });
 
-            modelBuilder.Entity("BLBM_ENV.Models.EnvanterDetail", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("BakirMAC")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DeviceModel")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DeviceName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DeviceServiceTag")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EnvanterID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("FiberMAC")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LinkSpeed")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LinkStatus")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Lok")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NicID")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PortID")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SwModel")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SwName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SwPort")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SwServiceTag")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Turu")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WWPN")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("EnvanterID");
-
-                    b.ToTable("EnvanterDetails");
-                });
-
             modelBuilder.Entity("BLBM_ENV.Models.Vip", b =>
                 {
                     b.Property<int>("ID")
@@ -274,24 +205,11 @@ namespace BLBM_Env.Migrations
                     b.Navigation("TargetDevice");
                 });
 
-            modelBuilder.Entity("BLBM_ENV.Models.EnvanterDetail", b =>
-                {
-                    b.HasOne("BLBM_ENV.Models.Envanter", "Envanter")
-                        .WithMany("Details")
-                        .HasForeignKey("EnvanterID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Envanter");
-                });
-
             modelBuilder.Entity("BLBM_ENV.Models.Envanter", b =>
                 {
                     b.Navigation("AsSourceConnections");
 
                     b.Navigation("AsTargetConnections");
-
-                    b.Navigation("Details");
                 });
 #pragma warning restore 612, 618
         }

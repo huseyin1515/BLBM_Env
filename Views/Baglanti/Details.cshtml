@@ -1,16 +1,16 @@
 ﻿@model BLBM_ENV.Models.Baglanti
 
 @{
-    ViewData["Title"] = "Bağlantı Detayı: " + Model.Source_DeviceName + " → " + Model.Target_DeviceName;
+    // --- GÜNCELLENDİ: Artık SourceDevice ve TargetDevice nesnelerinden isimleri alıyoruz ---
+    ViewData["Title"] = "Bağlantı Detayı: " + (Model.SourceDevice?.DeviceName ?? "Bilinmeyen Cihaz") + " → " + (Model.TargetDevice?.DeviceName ?? "Bilinmeyen Cihaz");
 }
 
 <style>
-    /* --- GÜNCELLENDİ: Düzen (Layout) CSS Grid ile yakınlaştırma ve ortalama --- */
     .schematic-container {
         display: grid;
-        grid-template-columns: 350px 1fr 350px; /* Ortadaki boşluk esnek */
-        justify-content: center; /* Tüm grid elemanlarını grup olarak ortalar */
-        gap: 6rem; /* Kartlar arasına belirgin boşluk ekler */
+        grid-template-columns: 350px 1fr 350px;
+        justify-content: center;
+        gap: 6rem;
         align-items: center;
         padding: 50px 0;
     }
@@ -25,18 +25,16 @@
         text-align: center;
         z-index: 10;
         position: relative;
-        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Hover efekti için */
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     }
 
-    /* --- YENİ EKLENDİ: Kartları tıklanabilir yapmak ve stilini düzeltmek için --- */
     .device-card-link {
-        text-decoration: none; /* Link alt çizgisini kaldır */
-        color: inherit; /* Yazı rengini karttan miras al */
-        display: block; /* Linkin tüm kart alanını kaplamasını sağla */
-        height: 100%; /* Linkin tüm kart yüksekliğini almasını sağla */
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        height: 100%;
     }
 
-        /* Link üzerine gelince kartın hover efekti çalışsın */
         .device-card-link:hover .device-card {
             transform: translateY(-5px);
             box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.1);
@@ -56,8 +54,7 @@
         position: relative;
         display: flex;
         align-items: center;
-        width: 100%; /* Ortadaki 1fr alanı tamamen doldurur */
-        /* Önceden burada olan margin ve transform kaldırıldı, çünkü gap yeterli */
+        width: 100%;
     }
 
     .arrow-body {
@@ -84,13 +81,13 @@
             background-position: 40px 0;
         }
     }
-
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="display-6">Bağlantı Şeması</h1>
-        <p class="text-muted">@Model.Source_DeviceName → @Model.Target_DeviceName</p>
+        <!-- GÜNCELLENDİ: Artık SourceDevice ve TargetDevice nesnelerinden isimleri alıyoruz -->
+        <p class="text-muted">@Model.SourceDevice?.DeviceName → @Model.TargetDevice?.DeviceName</p>
     </div>
     <a asp-action="Index" class="btn btn-outline-secondary">
         <i class="fas fa-arrow-left me-1"></i> Bağlantı Listesine Geri Dön
@@ -99,30 +96,29 @@
 <hr />
 
 <div class="schematic-container">
-    <!-- GÜNCELLENDİ: Kaynak Cihaz Kartı tıklanabilir yapıldı -->
     <a asp-controller="Envanter" asp-action="Details" asp-route-id="@Model.SourceDeviceID" class="device-card-link">
         <div class="device-card source">
             <i class="fas fa-server fa-3x mb-3 text-muted"></i>
-            <h3>@Model.SourceDevice.DeviceName</h3>
-            <p class="text-muted">@Model.SourceDevice.Model</p>
+            <!-- GÜNCELLENDİ: Artık SourceDevice nesnesinden özellikleri alıyoruz -->
+            <h3>@Model.SourceDevice?.DeviceName</h3>
+            <p class="text-muted">@Model.SourceDevice?.Model</p>
             <hr>
             <p>Bağlı Port</p>
             <span class="badge bg-success port-badge">@Model.Source_Port</span>
         </div>
     </a>
 
-    <!-- Ok Yapısı -->
     <div class="connection-arrow-wrapper">
         <div class="arrow-body"></div>
         <div class="arrow-head"></div>
     </div>
 
-    <!-- GÜNCELLENDİ: Hedef Cihaz Kartı tıklanabilir yapıldı -->
     <a asp-controller="Envanter" asp-action="Details" asp-route-id="@Model.TargetDeviceID" class="device-card-link">
         <div class="device-card target">
             <i class="fas fa-network-wired fa-3x mb-3 text-muted"></i>
-            <h3>@Model.TargetDevice.DeviceName</h3>
-            <p class="text-muted">@Model.TargetDevice.Model</p>
+            <!-- GÜNCELLENDİ: Artık TargetDevice nesnesinden özellikleri alıyoruz -->
+            <h3>@Model.TargetDevice?.DeviceName</h3>
+            <p class="text-muted">@Model.TargetDevice?.Model</p>
             <hr>
             <p>Bağlı Port</p>
             <span class="badge bg-secondary port-badge">@Model.Target_Port</span>

@@ -29,7 +29,7 @@ namespace BLBM_ENV.Models
         public virtual ICollection<Baglanti> AsSourceConnections { get; set; } = new List<Baglanti>();
         public virtual ICollection<Baglanti> AsTargetConnections { get; set; } = new List<Baglanti>();
 
-        // --- YENİ EKLENDİ: Envanterin port detaylarına erişim için ---
-        public virtual ICollection<EnvanterDetail> Details { get; set; } = new List<EnvanterDetail>();
+        // --- KALDIRILDI: EnvanterDetail ilişkisi artık yok ---
+        // public virtual ICollection<EnvanterDetail> Details { get; set; } = new List<EnvanterDetail>();
     }
 }

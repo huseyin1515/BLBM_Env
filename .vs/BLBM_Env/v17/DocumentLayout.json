@@ -1,22 +1,22 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\",
+  "WorkspaceRootPath": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\asus\\source\\repos\\blbm_env\\views\\envanter\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:views\\envanter\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\views\\baglanti\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:views\\baglanti\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\asus\\source\\repos\\blbm_env\\controllers\\envantercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:controllers\\envantercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\asus\\source\\repos\\blbm_env\\controllers\\baglanticontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\controllers\\baglanticontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:controllers\\baglanticontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\asus\\source\\repos\\blbm_env\\models\\unifiedportviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:models\\unifiedportviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\views\\envanter\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:views\\envanter\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\controllers\\envantercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:controllers\\envantercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,7 +26,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -34,55 +34,63 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "BaglantiController.cs",
-              "DocumentMoniker": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Controllers\\BaglantiController.cs",
-              "RelativeDocumentMoniker": "Controllers\\BaglantiController.cs",
-              "ToolTip": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Controllers\\BaglantiController.cs",
-              "RelativeToolTip": "Controllers\\BaglantiController.cs",
-              "ViewState": "AgIAAPIAAAAAAAAAAAAcwPwAAABYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-05T11:52:31.994Z",
+              "DocumentIndex": 0,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Views\\Baglanti\\Index.cshtml",
+              "RelativeDocumentMoniker": "Views\\Baglanti\\Index.cshtml",
+              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Views\\Baglanti\\Index.cshtml",
+              "RelativeToolTip": "Views\\Baglanti\\Index.cshtml",
+              "ViewState": "AgIAACgBAAAAAAAAAAAwwFYBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-07T19:41:24.38Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "Details.cshtml",
-              "DocumentMoniker": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Views\\Envanter\\Details.cshtml",
+              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Views\\Envanter\\Details.cshtml",
               "RelativeDocumentMoniker": "Views\\Envanter\\Details.cshtml",
-              "ToolTip": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Views\\Envanter\\Details.cshtml",
+              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Views\\Envanter\\Details.cshtml",
               "RelativeToolTip": "Views\\Envanter\\Details.cshtml",
-              "ViewState": "AgIAAFUBAAAAAAAAAAAAAFUBAAABAAAAAAAAAA==",
+              "ViewState": "AgIAABwBAAAAAAAAAAAAACQBAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-05T10:03:16.525Z",
+              "WhenOpened": "2025-09-07T17:45:39.702Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "UnifiedPortViewModel.cs",
-              "DocumentMoniker": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Models\\UnifiedPortViewModel.cs",
-              "RelativeDocumentMoniker": "Models\\UnifiedPortViewModel.cs",
-              "ToolTip": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Models\\UnifiedPortViewModel.cs",
-              "RelativeToolTip": "Models\\UnifiedPortViewModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAABAAAAAAAAAA==",
+              "Title": "EnvanterController.cs",
+              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Controllers\\EnvanterController.cs",
+              "RelativeDocumentMoniker": "Controllers\\EnvanterController.cs",
+              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Controllers\\EnvanterController.cs",
+              "RelativeToolTip": "Controllers\\EnvanterController.cs",
+              "ViewState": "AgIAAMwAAAAAAAAAAAAuwP4AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-05T10:02:35.485Z",
+              "WhenOpened": "2025-09-07T17:30:46.418Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "EnvanterController.cs",
-              "DocumentMoniker": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Controllers\\EnvanterController.cs",
-              "RelativeDocumentMoniker": "Controllers\\EnvanterController.cs",
-              "ToolTip": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Controllers\\EnvanterController.cs",
-              "RelativeToolTip": "Controllers\\EnvanterController.cs",
-              "ViewState": "AgIAANsAAAAAAAAAAAAAABEBAAABAAAAAAAAAA==",
+              "Title": "BaglantiController.cs",
+              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Controllers\\BaglantiController.cs",
+              "RelativeDocumentMoniker": "Controllers\\BaglantiController.cs",
+              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Controllers\\BaglantiController.cs",
+              "RelativeToolTip": "Controllers\\BaglantiController.cs",
+              "ViewState": "AgIAAN0AAAAAAAAAAAAAAA8BAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-05T09:55:39.12Z",
+              "WhenOpened": "2025-09-07T17:30:23.614Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
             }
           ]
         }

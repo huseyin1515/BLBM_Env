@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BLBM_Env")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+371c241686d79f023c6122b6c2cdb6444b4c1381")]
 [assembly: System.Reflection.AssemblyProductAttribute("BLBM_Env")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BLBM_Env")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
