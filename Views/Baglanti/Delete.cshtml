@@ -1,0 +1,38 @@
+﻿@model BLBM_ENV.Models.Baglanti
+
+@{
+    ViewData["Title"] = "Bağlantı Silme Onayı";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">Bu Bağlantıyı Silmek İstediğinizden Emin misiniz?</h4>
+    <p>Bu işlem geri alınamaz. Bu işlem hem iki cihaz arasındaki bağlantıyı hem de bu bağlantıyla ilişkili port detaylarını silecektir.</p>
+</div>
+
+<div>
+    <h4>Bağlantı Detayları</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Kaynak Cihaz</dt>
+        <dd class="col-sm-9">@Model.SourceDevice?.DeviceName</dd>
+
+        <dt class="col-sm-3">Kaynak Port</dt>
+        <dd class="col-sm-9">@Model.Source_Port</dd>
+
+        <dt class="col-sm-3">Hedef Cihaz</dt>
+        <dd class="col-sm-9">@Model.TargetDevice?.DeviceName</dd>
+
+        <dt class="col-sm-3">Hedef Port</dt>
+        <dd class="col-sm-9">@Model.Target_Port</dd>
+
+        <dt class="col-sm-3">Bağlantı Türü</dt>
+        <dd class="col-sm-9">@Model.ConnectionType</dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ID" />
+        <input type="submit" value="Evet, Bağlantıyı Sil" class="btn btn-danger" />
+        <a asp-controller="Envanter" asp-action="Details" asp-route-id="@Model.SourceDeviceID" class="btn btn-secondary">İptal Et ve Geri Dön</a>
+    </form>
+</div>

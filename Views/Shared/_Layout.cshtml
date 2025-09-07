@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Envanter Yönetimi</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <a class="text-light text-decoration-none" asp-controller="Envanter" asp-action="Index">
+                    <i class="fas fa-database me-2"></i>
+                    <strong>Envanter Projesi</strong>
+                </a>
+            </div>
+            <div class="list-group list-group-flush">
+                <a asp-controller="Envanter" asp-action="Index" class="list-group-item list-group-item-action bg-dark text-light"><i class="fas fa-fw fa-list me-2"></i>Envanter Listesi</a>
+                <a asp-controller="Baglanti" asp-action="Index" class="list-group-item list-group-item-action bg-dark text-light"><i class="fas fa-fw fa-network-wired me-2"></i>Bağlantı Listesi</a>
+                <a asp-controller="Vip" asp-action="Index" class="list-group-item list-group-item-action bg-dark text-light"><i class="fas fa-fw fa-project-diagram me-2"></i>VIP Listesi</a>
+                <a asp-controller="Kabin" asp-action="Index" class="list-group-item list-group-item-action bg-dark text-light"><i class="fas fa-fw fa-sitemap me-2"></i>Kabin Görünümü</a>
+                <a asp-controller="Envanter" asp-action="Create" class="list-group-item list-group-item-action bg-dark text-light"><i class="fas fa-fw fa-plus me-2"></i>Yeni Cihaz Ekle</a>
+                
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                <div class="container-fluid">
+                    <button class="btn btn-primary btn-sm" id="menu-toggle"><i class="fas fa-bars"></i></button>
+                </div>
+            </nav>
+
+            <main class="container-fluid p-4">
+                @RenderBody()
+            </main>
+
+            <footer class="border-top footer text-muted mt-auto bg-light">
+                <div class="container-fluid py-3">
+                    &copy; @DateTime.Now.Year - Envanter Projesi
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

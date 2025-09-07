@@ -1,0 +1,76 @@
+﻿@model IEnumerable<BLBM_ENV.Models.Vip>
+
+@{
+    ViewData["Title"] = "VIP Listesi";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">@Html.Raw(TempData["SuccessMessage"])<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">@Html.Raw(TempData["ErrorMessage"])<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+}
+@if (TempData["InfoMessage"] != null)
+{
+    <div class="alert alert-info alert-dismissible fade show" role="alert">@Html.Raw(TempData["InfoMessage"])<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">@ViewData["Title"]</h4>
+            <div class="btn-group">
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#detailImportModal"><i class="fas fa-database me-1"></i> Veri Zenginleştir</button>
+                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#resolveImportModal"><i class="fas fa-magic me-1"></i> DNS ile Otomatik Bul</button>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#standardImportModal"><i class="fas fa-file-excel me-1"></i> Standart Yükleme</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="vipTablosu" class="table table-striped table-bordered table-sm" style="width:100%">
+                <thead><tr><th>DNS</th><th>VIP IP</th><th>Port</th><th>Makine IP</th><th>Makine Adı</th><th>Durumu</th><th>Network</th><th>Cluster</th><th>Host</th><th>OS</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr><td>@item.Dns</td><td><code>@item.VipIp</code></td><td>@item.Port</td><td><code>@item.MakineIp</code></td><td>@item.MakineAdi</td><td>@item.Durumu</td><td>@item.Network</td><td>@item.Cluster</td><td>@item.Host</td><td>@item.OS</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="standardImportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content"><form asp-controller="Vip" asp-action="ImportStandardExcel" method="post" enctype="multipart/form-data"><div class="modal-header"><h5 class="modal-title">Standart Excel Yüklemesi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Bu seçenek, tüm sütunların bulunduğu standart bir Excel dosyasını doğrudan yükler.</p><div class="mb-3"><label class="form-label">Excel Dosyası (.xlsx)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx" required></div><hr /><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="deleteAll" value="true" id="deleteAllSwitchStd"><label class="form-check-label fw-bold" for="deleteAllSwitchStd">Mevcut Kayıtları Sil ve Yükle</label></div><div class="alert alert-danger mt-2"><strong>Dikkat:</strong> Bu seçeneği işaretlerseniz, veritabanındaki <strong>tüm VIP kayıtları kalıcı olarak silinecektir!</strong></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-success"><i class="fas fa-upload me-1"></i> Yükle</button></div></form></div></div>
+</div>
+
+<div class="modal fade" id="resolveImportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content"><form asp-controller="Vip" asp-action="ImportAndResolveFromExcel" method="post" enctype="multipart/form-data" id="resolveImportForm"><div class="modal-header"><h5 class="modal-title">DNS Çözümleme ile Ham Veri Yükle</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Bu seçenek, Excel'deki DNS adlarını <strong>nslookup</strong> ile çözümleyerek VIP IP'leri otomatik olarak bulur.</p><div class="mb-3"><label class="form-label">Ham Veri Excel Dosyası (.xlsx)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx" required></div><hr /><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="deleteAll" value="true" id="deleteAllSwitchResolve"><label class="form-check-label fw-bold" for="deleteAllSwitchResolve">Mevcut Kayıtları Sil ve Yükle</label></div><div class="alert alert-danger mt-2"><strong>Dikkat:</strong> Bu seçeneği işaretlerseniz, veritabanındaki <strong>tüm VIP kayıtları kalıcı olarak silinecektir!</strong></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-info"><i class="fas fa-magic me-1"></i> İşle ve Yükle</button></div></form></div></div>
+</div>
+
+<div class="modal fade" id="detailImportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content"><form asp-controller="Vip" asp-action="UpdateVipsFromDetailExcel" method="post" enctype="multipart/form-data"><div class="modal-header"><h5 class="modal-title">Detay Excel'i ile Veri Zenginleştir</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Bu seçenek, mevcut VIP listesindeki boş alanları, yükleyeceğiniz Excel'deki <strong>Makine IP</strong> eşleşmesine göre doldurur.</p><div class="alert alert-info"><strong>Excel Formatı:</strong><br>Sütun 3: Primary IP Address (Eşleştirme için)<br>...ve diğerleri</div><div class="mb-3"><label class="form-label">Detay Excel Dosyası (.xlsx)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx" required></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-warning"><i class="fas fa-database me-1"></i> Güncelle ve Zenginleştir</button></div></form></div></div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#vipTablosu').DataTable({
+                pageLength: 25,
+                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"] ],
+                language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json', }
+            });
+
+            // Yükleme sırasında butonu kilitlemek için basit bir script
+            $('#resolveImportForm').on('submit', function() {
+                if ($(this).find('input[type=file]').val()) {
+                    var btn = $(this).find('button[type=submit]');
+                    btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Yükleniyor...');
+                }
+            });
+        });
+    </script>
+}

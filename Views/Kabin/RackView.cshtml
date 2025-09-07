@@ -1,0 +1,239 @@
+﻿@{
+    ViewData["Title"] = "Kabin Görünümü: " + ViewBag.Location;
+}
+
+<style>
+    body {
+        background-color: #f4f5f7;
+    }
+
+    .rack-view-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .rack-container-wrapper {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+    }
+
+    @@media (max-width: 1400px) {
+        .rack-container-wrapper {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .rack-container-wrapper {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .rack-column {
+        min-width: 0;
+    }
+
+    .rack-title {
+        text-align: center;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 10px;
+    }
+
+    .rack-frame {
+        position: relative;
+        height: 714px;
+        background-color: #fff;
+        border: 1px solid #d1d5db;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+        display: flex;
+        padding: 0 5px;
+    }
+
+    .device-area {
+        position: relative;
+        flex-grow: 1;
+        background-image: repeating-linear-gradient(#fff 0, #fff 16px, #f0f2f5 16px, #f0f2f5 17px);
+    }
+
+    .u-column {
+        width: 25px;
+        display: flex;
+        flex-direction: column-reverse;
+        text-align: center;
+        z-index: 2;
+    }
+
+    .u-number {
+        height: 17px;
+        font-size: 9px;
+        font-weight: 500;
+        color: #9ca3af;
+        line-height: 17px;
+        position: relative;
+    }
+
+    .u-column:first-child .u-number::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        height: 1px;
+        width: 5px;
+        background-color: #d1d5db;
+    }
+
+    .u-column:last-child .u-number::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        height: 1px;
+        width: 5px;
+        background-color: #d1d5db;
+    }
+
+    .rack-device {
+        position: absolute;
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2px 8px;
+        font-size: 11px;
+        color: white;
+        overflow: hidden;
+        white-space: nowrap;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1);
+        z-index: 5;
+        /* *** EFEKT İÇİN GEÇİŞ (TRANSITION) EKLENDİ *** */
+        transition: all 0.2s ease-in-out;
+    }
+
+        /* *** YENİ: İMLEÇ ÜZERİNE GELDİĞİNDE UYGULANACAK STİLLER *** */
+        .rack-device:hover {
+            z-index: 10; /* Diğer cihazların üzerine çıkması için */
+            transform: scale(1.05); /* %5 oranında büyüt */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Gölgeyi belirginleştir */
+        }
+
+    .device-name {
+        font-weight: 600;
+    }
+
+    .device-u-range {
+        font-size: 10px;
+        opacity: 0.9;
+        background-color: rgba(0,0,0,0.2);
+        padding: 1px 4px;
+        border-radius: 3px;
+    }
+
+    /* RENK PALETİ */
+    .rack-device[data-tur="Server"] {
+        background: linear-gradient(to bottom, #4f8ff7, #3b82f6);
+        border-color: #2563eb;
+    }
+
+    .rack-device[data-tur="NW Switch"] {
+        background: linear-gradient(to bottom, #12c289, #10b981);
+        border-color: #059669;
+    }
+
+    .rack-device[data-tur="SAN Switch"] {
+        background: linear-gradient(to bottom, #f25555, #ef4444);
+        border-color: #dc2626;
+    }
+
+    .rack-device[data-tur="Storage"] {
+        background: linear-gradient(to bottom, #f7ac2a, #f59e0b);
+        border-color: #d97706;
+        color: #1f2937;
+    }
+
+    .rack-device[data-tur="Firewall"] {
+        background: linear-gradient(to bottom, #7b52c7, #6f42c1);
+        border-color: #59359a;
+    }
+
+    .rack-device[data-tur="Belirsiz"] {
+        background: linear-gradient(to bottom, #85909c, #6c757d);
+        border-color: #565e64;
+    }
+
+</style>
+
+<div class="rack-view-header">
+    <h2 class="h4">Kabin Görünümü: <strong>@ViewBag.Location</strong></h2>
+    <a href="@Url.Action("Index", "Kabin")" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Lokasyon Değiştir</a>
+</div>
+
+<div id="rack-container" class="rack-container-wrapper">
+    <!-- Kabinler JavaScript ile buraya yüklenecek -->
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            const locationName = '@ViewBag.Location';
+            const container = $('#rack-container');
+            const totalU = 42;
+            const uHeight = 17;
+            const definedTurler = ["Server", "NW Switch", "SAN Switch", "Storage", "Firewall"];
+
+            $.getJSON(`/api/kabin/location/${locationName}`, function(kabinler) {
+                container.empty();
+                if (kabinler && kabinler.length > 0) {
+                    kabinler.forEach(function(kabin) {
+                        const kabinGroup = $('<div class="rack-column"></div>');
+                        kabinGroup.append(createRackColumn(kabin.kabinName, "(Ön)", kabin.frontDevices));
+                        container.append(kabinGroup);
+
+                        const kabinGroupArka = $('<div class="rack-column"></div>');
+                        kabinGroupArka.append(createRackColumn(kabin.kabinName, "(Arka)", kabin.rearDevices));
+                        container.append(kabinGroupArka);
+                    });
+                } else {
+                     container.html('<p class="text-muted text-center w-100">Bu lokasyonda gösterilecek kabin veya cihaz bulunamadı.</p>');
+                }
+            });
+
+            function createRackColumn(name, suffix, devices) {
+                const columnContent = $('<div></div>');
+                columnContent.append(`<div class="rack-title">${name} ${suffix}</div>`);
+
+                const frame = $('<div class="rack-frame"></div>');
+                const uColLeft = $('<div class="u-column"></div>'), deviceArea = $('<div class="device-area"></div>'), uColRight = $('<div class="u-column"></div>');
+
+                for (let i = 1; i <= totalU; i++) {
+                    uColLeft.append(`<div class="u-number">${i}</div>`);
+                    uColRight.append(`<div class="u-number">${i}</div>`);
+                }
+
+                devices.forEach(function(device) {
+                    const topPos = (totalU - device.startU - device.heightU + 1) * uHeight;
+                    const deviceTur = (device.tur && definedTurler.includes(device.tur)) ? device.tur : "Belirsiz";
+                    const deviceDiv = $(`
+                        <div class="rack-device" data-tur="${deviceTur}" style="top: ${topPos}px; height: ${device.heightU * uHeight}px;" title="${device.deviceName}">
+                            <span class="device-name">${device.deviceName}</span>
+                            <span class="device-u-range">${device.kabinU}</span>
+                        </div>
+                    `);
+                    deviceDiv.on('click', () => window.location.href = `/Envanter/Details/${device.id}`);
+                    deviceArea.append(deviceDiv);
+                });
+
+                frame.append(uColLeft, deviceArea, uColRight);
+                columnContent.append(frame);
+                return columnContent;
+            }
+        });
+    </script>
+}

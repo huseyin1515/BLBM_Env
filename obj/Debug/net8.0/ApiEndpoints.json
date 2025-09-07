@@ -1,0 +1,28 @@
+[
+  {
+    "ContainingType": "BLBM_ENV.Controllers.KabinApiController",
+    "Method": "GetFullLocationDetails",
+    "RelativePath": "api/kabin/location/{locationName}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "locationName",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BLBM_ENV.Controllers.KabinApiController",
+    "Method": "GetLocations",
+    "RelativePath": "api/kabin/locations",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]

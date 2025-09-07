@@ -1,0 +1,43 @@
+﻿@model BLBM_ENV.Models.Envanter
+
+@{
+    ViewData["Title"] = "Silme Onayı";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">Emin misiniz?</h4>
+    <p>Aşağıdaki kaydı kalıcı olarak silmek üzeresiniz. Bu işlem geri alınamaz.</p>
+</div>
+
+<div>
+    <h4>Envanter Cihazı</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.DeviceName)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.DeviceName)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Tur)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Tur)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Model)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Model)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ID" />
+        <input type="submit" value="Evet, Sil" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+    </form>
+</div>

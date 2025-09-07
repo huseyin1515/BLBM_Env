@@ -1,0 +1,342 @@
+﻿@using System.Text.Json
+@using BLBM_ENV.Models
+
+
+@{
+    ViewData["Title"] = "Detaylar: " + Model.DeviceName;
+    var allConnectionsJson = JsonSerializer.Serialize(ViewBag.AllConnections);
+    var sortedUnifiedPortList = ViewBag.UnifiedPortList as List<UnifiedPortViewModel> ?? new List<UnifiedPortViewModel>();
+}
+
+
+<style>
+    .form-step {
+        display: none;
+    }
+</style>
+
+
+<div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="display-6 mb-0">@Model.DeviceName</h1>
+            <p class="text-muted mb-0">Cihaz Detayları ve Bağlantı Yönetimi</p>
+        </div>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.ID" class="btn btn-outline-warning"><i class="fas fa-pencil-alt me-1"></i> Cihazı Düzenle</a>
+            <a asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Listeye Geri Dön</a>
+        </div>
+    </div>
+    <hr />
+
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light"><h5 class="mb-0"><i class="fas fa-server me-2 text-primary"></i>Cihaz Bilgileri</h5></div>
+        <div class="card-body">
+            <dl class="row">
+                <div class="col-md-6">
+                    <dt class="col-sm-5">Cihaz Adı</dt><dd class="col-sm-7">@Model.DeviceName</dd>
+                    <dt class="col-sm-5">Tür</dt><dd class="col-sm-7"><span class="badge bg-primary">@Model.Tur</span></dd>
+                    <dt class="col-sm-5">Model</dt><dd class="col-sm-7">@Model.Model</dd>
+                    <dt class="col-sm-5">Servis Etiketi / Seri No</dt><dd class="col-sm-7"><code>@Model.ServiceTagSerialNumber</code></dd>
+                    <dt class="col-sm-5">İşletim Sistemi</dt><dd class="col-sm-7">@Model.OperatingSystem</dd>
+                </div>
+                <div class="col-md-6">
+                    <dt class="col-sm-5">Yönetim IP Adresi</dt><dd class="col-sm-7">@Model.IpAddress</dd>
+                    <dt class="col-sm-5">ILO / IDRAC IP</dt><dd class="col-sm-7">@Model.IloIdracIp</dd>
+                    <dt class="col-sm-5">VCenter Adresi</dt><dd class="col-sm-7">@Model.VcenterAddress</dd>
+                    <dt class="col-sm-5">Cluster</dt><dd class="col-sm-7">@Model.ClusterName</dd>
+                </div>
+                <div class="col-12"><hr /><dt class="col-sm-3">Fiziksel Konum</dt><dd class="col-sm-9">@Model.Location - Kabin: @Model.Kabin (@Model.RearFront) - U: @Model.KabinU</dd></div>
+            </dl>
+        </div>
+    </div>
+
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light"><h5 class="mb-0"><i class="fas fa-network-wired me-2 text-success"></i>Mevcut Bağlantılar ve Port Detayları</h5></div>
+        <div class="card-body">
+            @if (!sortedUnifiedPortList.Any())
+            {
+                <div class="text-center p-3"><p class="text-muted">Bu cihaza ait kayıtlı bağlantı veya port detayı bulunmamaktadır.</p></div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-sm align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Port (@Model.DeviceName)</th>
+                                <th>Tür</th>
+                                <th>Link Durumu</th>
+                                <th>Link Hızı</th>
+                                <th>MAC Adresi</th>
+                                <th>WWPN</th>
+                                <th>Karşı Cihaz</th>
+                                <th>Karşı Port</th>
+                                <th class="text-center">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in sortedUnifiedPortList)
+                            {
+                                <tr class="@(item.IsVirtual ? "table-info" : "")">
+                                    <td><strong><span class="badge bg-primary fs-6">@item.Port</span></strong></td>
+                                    <td>@item.Type</td>
+                                    <td>@item.LinkStatus</td>
+                                    <td>@item.LinkSpeed</td>
+                                    <td><code>@item.MacAddress</code></td>
+                                    <td><code>@item.WWPN</code></td>
+                                    @if (item.IsConnected)
+                                    {
+                                        <td>
+                                            @if (item.RemoteDevice != null)
+                                            {
+                                                <a asp-action="Details" asp-route-id="@item.RemoteDevice.ID">@item.RemoteDevice.DeviceName</a>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">@item.RemotePort</span>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td colspan="2" class="text-center fst-italic text-muted">Boşta / Bağlantı Yok</td>
+                                    }
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-controller="EnvanterDetail" asp-action="GetOrCreateDetail" asp-route-envanterId="@Model.ID" asp-route-portName="@item.Port" class="btn btn-outline-warning" title="Port Detayını Düzenle"><i class="fas fa-pencil-alt"></i></a>
+                                            @if (item.ConnectionID != 0)
+                                            {
+                                                <a asp-controller="Baglanti" asp-action="Delete" asp-route-id="@item.ConnectionID" class="btn btn-outline-danger" title="Bağlantıyı Sil"><i class="fas fa-unlink"></i></a>
+                                            }
+                                            else if (item.DetailID != 0)
+                                            {
+                                                <a asp-controller="EnvanterDetail" asp-action="DeleteDetail" asp-route-id="@item.DetailID" class="btn btn-outline-danger" title="Port Detayını Sil"><i class="fas fa-trash-alt"></i></a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-light"><h5 class="mb-0"><i class="fas fa-plus-circle me-2 text-info"></i>Yeni Bağlantı Oluştur</h5></div>
+        <div class="card-body">
+            <form asp-controller="Baglanti" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="SourceDeviceID" value="@Model.ID" />
+                <div class="row">
+                    <!-- Adım 1: Kaynak Port -->
+                    <div class="col-md-3 mb-3" id="kaynakPortContainer">
+                        <label class="form-label fw-bold">1. Kaynak Port (@Model.DeviceName)</label>
+                        <input type="text" id="kaynakPortInput" name="Source_Port" class="form-control" required />
+                        <div id="kaynakPortWarning" class="alert alert-warning p-2 mt-2" style="display: none;"></div>
+                    </div>
+                    <!-- Adım 2: Hedef Cihaz Türü -->
+                    <div class="col-md-3 mb-3 form-step" id="targetTypeContainer">
+                        <label class="form-label fw-bold">2. Hedef Cihaz Türü</label>
+                        <select id="targetDeviceTypeFilter" class="form-select">
+                            <option value="">-- Tüm Türler --</option>
+                            <option value="NW Switch">NW Switch</option>
+                            <option value="SAN Switch">SAN Switch</option>
+                            <option value="Server">Server</option>
+                            <option value="Storage">Storage</option>
+                            <option value="Firewall">Firewall</option>
+                        </select>
+                    </div>
+                    <!-- Adım 3: Hedef Cihaz -->
+                    <div class="col-md-3 mb-3 form-step" id="targetDeviceContainer">
+                        <label class="form-label fw-bold">3. Hedef Cihaz</label>
+                        <select id="targetDeviceSelect" name="TargetDeviceID" class="form-select" required></select>
+                    </div>
+                    <!-- Adım 4: Hedef Port -->
+                    <div class="col-md-3 mb-3 form-step" id="hedefPortContainer">
+                        <label class="form-label fw-bold">4. Hedef Port</label>
+                        <input type="text" id="hedefPortInput" name="Target_Port" class="form-control" required />
+                        <div id="hedefPortWarning" class="alert alert-warning p-2 mt-2" style="display: none;"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <!-- Adım 5: Bağlantı Türü -->
+                    <div class="col-md-3 mb-3 form-step" id="connectionTypeContainer">
+                        <label class="form-label fw-bold">5. Bağlantı Türü</label>
+                        <select name="ConnectionType" id="connectionTypeSelect" class="form-select">
+                            <option value="">-- Tür Seçin --</option>
+                            <option value="Bakır">Bakır</option>
+                            <option value="Fiber">Fiber</option>
+                            <option value="FC">FC (Fiber Channel)</option>
+                        </select>
+                    </div>
+                    <!-- Adım 6: Dinamik Port Detayları -->
+                    <div class="col-md-6 mb-3 form-step" id="portDetailsContainer">
+                        <div class="row">
+                            <!-- Kaynak Detay Alanı -->
+                            <div class="col-md-6 conditional-field" id="sourceDetailWrapper">
+                                <label class="form-label" id="sourceDetailLabel"></label>
+                                <input type="text" name="sourceDetailValue" class="form-control" />
+                            </div>
+                            <!-- Hedef Detay Alanı -->
+                            <div class="col-md-6 conditional-field" id="targetDetailWrapper">
+                                <label class="form-label" id="targetDetailLabel"></label>
+                                <input type="text" name="targetDetailValue" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mt-2 text-end">
+                    <button type="submit" class="btn btn-success form-step" id="createConnectionBtn"><i class="fas fa-plus me-1"></i> Bağlantıyı Oluştur</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const allConnections = @Html.Raw(allConnectionsJson);
+            const allDeviceOptions = @Html.Raw(JsonSerializer.Serialize(((List<Envanter>)ViewBag.AllDevicesForSelectList).Select(d => new { id = d.ID, name = d.DeviceName, tur = d.Tur })));
+            const sourceDeviceType = '@Model.Tur';
+
+
+            // Form elemanlarını seç
+            const formElements = {
+                kaynakPort: $('#kaynakPortInput'),
+                targetType: $('#targetDeviceTypeFilter'),
+                targetDevice: $('#targetDeviceSelect'),
+                hedefPort: $('#hedefPortInput'),
+                connectionType: $('#connectionTypeSelect'),
+                submitBtn: $('#createConnectionBtn'),
+                portDetailsContainer: $('#portDetailsContainer'),
+                sourceDetailWrapper: $('#sourceDetailWrapper'),
+                targetDetailWrapper: $('#targetDetailWrapper'),
+                sourceDetailLabel: $('#sourceDetailLabel'),
+                targetDetailLabel: $('#targetDetailLabel')
+            };
+
+
+            const containers = {
+                targetType: $('#targetTypeContainer'),
+                targetDevice: $('#targetDeviceContainer'),
+                hedefPort: $('#hedefPortContainer'),
+                connectionType: $('#connectionTypeContainer')
+            };
+
+
+            function updateFormState() {
+                const kaynakPortVal = formElements.kaynakPort.val().trim();
+                const targetTypeVal = formElements.targetType.val();
+                const targetDeviceVal = formElements.targetDevice.val();
+                const hedefPortVal = formElements.hedefPort.val().trim();
+                const connectionTypeVal = formElements.connectionType.val();
+
+
+                // Adım 2
+                kaynakPortVal ? containers.targetType.slideDown() : containers.targetType.slideUp();
+                // Adım 3
+                targetTypeVal ? containers.targetDevice.slideDown() : containers.targetDevice.slideUp();
+                // Adım 4
+                targetDeviceVal ? containers.hedefPort.slideDown() : containers.hedefPort.slideUp();
+                // Adım 5
+                hedefPortVal ? containers.connectionType.slideDown() : containers.connectionType.slideUp();
+
+
+                // Adım 6: Port Detayları
+                if (connectionTypeVal) {
+                    formElements.portDetailsContainer.slideDown();
+                    const targetDeviceType = formElements.targetDevice.find('option:selected').data('tur');
+
+
+                    $('.conditional-field').hide(); // Önce hepsini gizle
+
+
+                    switch (connectionTypeVal) {
+                        case 'Bakır':
+                            formElements.sourceDetailLabel.text(`Kaynak Bakır MAC`);
+                            formElements.targetDetailLabel.text(`Hedef Bakır MAC`);
+                            formElements.sourceDetailWrapper.show();
+                            formElements.targetDetailWrapper.show();
+                            break;
+                        case 'Fiber':
+                            formElements.sourceDetailLabel.text(`Kaynak Fiber MAC`);
+                            formElements.targetDetailLabel.text(`Hedef Fiber MAC`);
+                            formElements.sourceDetailWrapper.show();
+                            formElements.targetDetailWrapper.show();
+                            break;
+                        case 'FC':
+                            if (sourceDeviceType === 'SAN Switch' || targetDeviceType === 'SAN Switch') {
+                                formElements.sourceDetailLabel.text(`Kaynak WWPN`);
+                                formElements.targetDetailLabel.text(`Hedef WWPN`);
+                                formElements.sourceDetailWrapper.show();
+                                formElements.targetDetailWrapper.show();
+                            }
+                            break;
+                    }
+                     formElements.submitBtn.slideDown();
+                } else {
+                    formElements.portDetailsContainer.slideUp();
+                    formElements.submitBtn.slideUp();
+                }
+            }
+
+
+            // Olay dinleyicileri
+            $('form input, form select').on('input change', updateFormState);
+
+
+            formElements.targetType.on('change', function() {
+                const selectedType = $(this).val();
+                formElements.targetDevice.empty().append('<option value="">-- Cihaz Seçin --</option>');
+                const filteredDevices = selectedType === "" ? allDeviceOptions : allDeviceOptions.filter(d => d.tur === selectedType);
+                $.each(filteredDevices, function(i, device) {
+                    formElements.targetDevice.append($('<option>', {
+                        value: device.id,
+                        'data-tur': device.tur,
+                        text: device.name
+                    }));
+                });
+            });
+
+
+            // Port kullanım uyarıları
+            formElements.kaynakPort.on('input', function() {
+                const enteredPort = $(this).val().trim();
+                const warningDiv = $('#kaynakPortWarning');
+                if (!enteredPort) { warningDiv.slideUp(); return; }
+                const connectionInUse = allConnections.find(conn => (conn.SourceDeviceName === '@Model.DeviceName' && conn.SourcePort && conn.SourcePort.toLowerCase() === enteredPort.toLowerCase()) || (conn.TargetDeviceName === '@Model.DeviceName' && conn.TargetPort && conn.TargetPort.toLowerCase() === enteredPort.toLowerCase()));
+                if (connectionInUse) {
+                    const otherDevice = connectionInUse.SourceDeviceName === '@Model.DeviceName' ? connectionInUse.TargetDeviceName : connectionInUse.SourceDeviceName;
+                    warningDiv.html(`<strong>Uyarı:</strong> Bu port zaten <strong>${otherDevice}</strong> cihazına bağlı.`).slideDown();
+                } else {
+                    warningDiv.slideUp();
+                }
+            });
+
+
+            function checkTargetPort() {
+                const enteredPort = formElements.hedefPort.val().trim();
+                const targetDeviceName = formElements.targetDevice.find('option:selected').text();
+                const warningDiv = $('#hedefPortWarning');
+                if (!enteredPort || !targetDeviceName) { warningDiv.slideUp(); return; }
+                const connectionInUse = allConnections.find(conn => (conn.SourceDeviceName === targetDeviceName && conn.SourcePort && conn.SourcePort.toLowerCase() === enteredPort.toLowerCase()) || (conn.TargetDeviceName === targetDeviceName && conn.TargetPort && conn.TargetPort.toLowerCase() === enteredPort.toLowerCase()));
+                 if (connectionInUse) {
+                    const otherDevice = connectionInUse.SourceDeviceName === targetDeviceName ? connectionInUse.TargetDeviceName : connectionInUse.SourceDeviceName;
+                    warningDiv.html(`<strong>Uyarı:</strong> <strong>${targetDeviceName}</strong> cihazının bu portu zaten <strong>${otherDevice}</strong> cihazına bağlı.`).slideDown();
+                } else {
+                    warningDiv.slideUp();
+                }
+            }
+            formElements.hedefPort.on('input', checkTargetPort);
+            formElements.targetDevice.on('change', checkTargetPort);
+        });
+    </script>
+}

@@ -1,0 +1,135 @@
+﻿@model BLBM_ENV.Models.Baglanti
+
+@{
+    ViewData["Title"] = "Bağlantı Detayı: " + Model.Source_DeviceName + " → " + Model.Target_DeviceName;
+}
+
+<style>
+    /* --- GÜNCELLENDİ: Düzen (Layout) CSS Grid ile yakınlaştırma ve ortalama --- */
+    .schematic-container {
+        display: grid;
+        grid-template-columns: 350px 1fr 350px; /* Ortadaki boşluk esnek */
+        justify-content: center; /* Tüm grid elemanlarını grup olarak ortalar */
+        gap: 6rem; /* Kartlar arasına belirgin boşluk ekler */
+        align-items: center;
+        padding: 50px 0;
+    }
+
+    .device-card {
+        width: 350px;
+        border: 1px solid #dee2e6;
+        border-radius: .5rem;
+        padding: 1.5rem;
+        background-color: #fff;
+        box-shadow: 0 .25rem .75rem rgba(0,0,0,.05);
+        text-align: center;
+        z-index: 10;
+        position: relative;
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Hover efekti için */
+    }
+
+    /* --- YENİ EKLENDİ: Kartları tıklanabilir yapmak ve stilini düzeltmek için --- */
+    .device-card-link {
+        text-decoration: none; /* Link alt çizgisini kaldır */
+        color: inherit; /* Yazı rengini karttan miras al */
+        display: block; /* Linkin tüm kart alanını kaplamasını sağla */
+        height: 100%; /* Linkin tüm kart yüksekliğini almasını sağla */
+    }
+
+        /* Link üzerine gelince kartın hover efekti çalışsın */
+        .device-card-link:hover .device-card {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.1);
+        }
+
+    .device-card h3 {
+        color: #212529;
+    }
+
+    .port-badge {
+        font-size: 1.2rem;
+        padding: .5em .8em;
+    }
+
+    .connection-arrow-wrapper {
+        height: 30px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%; /* Ortadaki 1fr alanı tamamen doldurur */
+        /* Önceden burada olan margin ve transform kaldırıldı, çünkü gap yeterli */
+    }
+
+    .arrow-body {
+        width: 100%;
+        height: 6px;
+        background-image: repeating-linear-gradient( 90deg, #198754, #198754 10px, transparent 10px, transparent 20px );
+        animation: marching-ants 1.5s linear infinite;
+    }
+
+    .arrow-head {
+        width: 0;
+        height: 0;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-left: 15px solid #198754;
+    }
+
+    @@keyframes marching-ants {
+        from {
+            background-position: 0 0;
+        }
+
+        to {
+            background-position: 40px 0;
+        }
+    }
+
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="display-6">Bağlantı Şeması</h1>
+        <p class="text-muted">@Model.Source_DeviceName → @Model.Target_DeviceName</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Bağlantı Listesine Geri Dön
+    </a>
+</div>
+<hr />
+
+<div class="schematic-container">
+    <!-- GÜNCELLENDİ: Kaynak Cihaz Kartı tıklanabilir yapıldı -->
+    <a asp-controller="Envanter" asp-action="Details" asp-route-id="@Model.SourceDeviceID" class="device-card-link">
+        <div class="device-card source">
+            <i class="fas fa-server fa-3x mb-3 text-muted"></i>
+            <h3>@Model.SourceDevice.DeviceName</h3>
+            <p class="text-muted">@Model.SourceDevice.Model</p>
+            <hr>
+            <p>Bağlı Port</p>
+            <span class="badge bg-success port-badge">@Model.Source_Port</span>
+        </div>
+    </a>
+
+    <!-- Ok Yapısı -->
+    <div class="connection-arrow-wrapper">
+        <div class="arrow-body"></div>
+        <div class="arrow-head"></div>
+    </div>
+
+    <!-- GÜNCELLENDİ: Hedef Cihaz Kartı tıklanabilir yapıldı -->
+    <a asp-controller="Envanter" asp-action="Details" asp-route-id="@Model.TargetDeviceID" class="device-card-link">
+        <div class="device-card target">
+            <i class="fas fa-network-wired fa-3x mb-3 text-muted"></i>
+            <h3>@Model.TargetDevice.DeviceName</h3>
+            <p class="text-muted">@Model.TargetDevice.Model</p>
+            <hr>
+            <p>Bağlı Port</p>
+            <span class="badge bg-secondary port-badge">@Model.Target_Port</span>
+        </div>
+    </a>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+}
