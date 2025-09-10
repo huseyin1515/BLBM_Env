@@ -2,53 +2,12 @@
 
 @{
     ViewData["Title"] = "Bağlantı Listesi";
-    var physicalConnections = ViewBag.PhysicalConnections as List<BLBM_ENV.Models.BaglantiIndexViewModel> ?? new List<BLBM_ENV.Models.BaglantiIndexViewModel>();
-    var virtualConnections = ViewBag.VirtualConnections as List<BLBM_ENV.Models.BaglantiIndexViewModel> ?? new List<BLBM_ENV.Models.BaglantiIndexViewModel>();
+    var allConnections = ViewBag.AllConnections as List<BLBM_ENV.Models.BaglantiIndexViewModel> ?? new List<BLBM_ENV.Models.BaglantiIndexViewModel>();
     var allConnectionsJson = JsonSerializer.Serialize(ViewBag.AllConnections);
 }
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
 <style>
-    .filter-icon {
-        cursor: pointer;
-        margin-left: 5px;
-        color: #6c757d;
-        transition: color 0.2s;
-    }
-
-        .filter-icon:hover, .filter-icon.active {
-            color: #0d6efd;
-        }
-
-    .dt-filter-dropdown {
-        position: absolute;
-        background: white;
-        border: 1px solid #ccc;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        padding: 15px;
-        border-radius: 5px;
-        z-index: 1050;
-        width: 280px;
-    }
-
-    .dt-filter-list {
-        max-height: 200px;
-        overflow-y: auto;
-        margin-top: 10px;
-        font-size: 0.9rem;
-    }
-
-    .dt-filter-item {
-        padding: 2px 0;
-    }
-
-    table.dataTable thead .sorting::before, table.dataTable thead .sorting::after,
-    table.dataTable thead .sorting_asc::before, table.dataTable thead .sorting_asc::after,
-    table.dataTable thead .sorting_desc::before, table.dataTable thead .sorting_desc::after {
-        content: "" !important;
-        opacity: 0 !important;
-    }
-
     .modal-form-step, .modal-conditional-field {
         display: none;
     }
@@ -63,7 +22,69 @@
     .modal-form-step, .modal-conditional-field {
         flex: 0 1 250px;
     }
+
+    tr[data-connection-type="virtual"] {
+        background-color: #e2f3ff !important;
+    }
+
+    #baglantiTablosu tbody tr {
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+        #baglantiTablosu tbody tr:hover {
+            background-color: #e9ecef !important;
+        }
+
+    .selection-card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+    }
+
+        .selection-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+            border-color: #0d6efd;
+        }
+
+        .selection-card i {
+            font-size: 2rem;
+            color: #0d6efd;
+        }
 </style>
+
+<div class="page-header">
+    <h1 class="page-title">@ViewData["Title"]</h1>
+    <!-- GÜNCELLENDİ: Butonların renkleri ve sınıfları değiştirildi -->
+    <div class="btn-group">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="viewOptionsBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-eye me-2"></i>Görünüm
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="viewOptionsBtn">
+                <li><a class="dropdown-item view-filter-btn" href="#" data-filter="all">Tümünü Göster</a></li>
+                <li><a class="dropdown-item view-filter-btn" href="#" data-filter="physical">Sadece Fiziksel</a></li>
+                <li><a class="dropdown-item view-filter-btn" href="#" data-filter="virtual">Sadece Sanal</a></li>
+            </ul>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="exportOptionsBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-file-export me-1"></i> Dışa Aktar
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="exportOptionsBtn">
+                <li><a class="dropdown-item" asp-action="ExportToExcel"><i class="fas fa-file-excel me-2 text-success"></i>Excel Olarak Aktar (.xlsx)</a></li>
+                <li><a class="dropdown-item" asp-action="ExportToCsv"><i class="fas fa-file-csv me-2 text-secondary"></i>CSV Olarak Aktar (.csv)</a></li>
+            </ul>
+        </div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addConnectionChoiceModal">
+            <i class="fas fa-plus me-1"></i> Bağlantı Yükle / Ekle
+        </button>
+    </div>
+</div>
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -79,19 +100,25 @@
 }
 
 <div class="card shadow-sm mb-4">
-    <div class="card-header"><div class="d-flex justify-content-between align-items-center"><h4 class="mb-0"><i class="fas fa-plug me-2"></i>Fiziksel Bağlantılar (@physicalConnections.Count)</h4><div class="btn-group"><button class="btn btn-outline-info btn-sm" id="toggleVirtualsBtn">Sanal Bağlantıları Göster/Gizle (@virtualConnections.Count)</button><button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#manualConnectionModal"><i class="fas fa-plus me-1"></i> Manuel Bağlantı Ekle</button><button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#virtualImportModal"><i class="fas fa-magic me-1"></i> Sanal Yol Haritası Yükle</button><button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#physicalImportModal"><i class="fas fa-file-excel me-1"></i> Standart Bağlantı Yükle</button></div></div></div>
     <div class="card-body">
         <div class="table-responsive">
-            <table id="fizikselBaglantiTablosu" class="table table-striped table-bordered table-sm filterable-table" style="width:100%">
+            <table id="baglantiTablosu" class="table table-striped table-bordered table-sm" style="width:100%">
                 <thead><tr><th>Kaynak Cihaz</th><th>Kaynak Port</th><th>Bağlantı Türü</th><th>Link Status</th><th>Link Speed</th><th>NIC ID</th><th>Bakır MAC</th><th>Fiber MAC</th><th>WWPN</th><th>Hedef Cihaz</th><th>Hedef Port</th><th class="text-center no-sort no-filter">İşlemler</th></tr></thead>
                 <tbody>
-                    @foreach (var vm in physicalConnections)
+                    @foreach (var vm in allConnections)
                     {
-                        <tr>
+                        var connectionDataType = (vm.ConnectionType ?? "").StartsWith("Virtual") ? "virtual" : "physical";
+                        <tr data-connection-type="@connectionDataType">
                             <td><a asp-controller="Envanter" asp-action="Details" asp-route-id="@vm.SourceDeviceID">@vm.SourceDeviceName</a></td>
-                            <td><span class="badge bg-success">@vm.SourcePort</span></td>
+                            <td><span class="badge @(connectionDataType == "virtual" ? "bg-info" : "bg-success")">@vm.SourcePort</span></td>
                             <td>@vm.ConnectionType</td>
-                            <td>@vm.LinkStatus</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(vm.LinkStatus))
+                                {
+                                    var statusClass = (vm.LinkStatus.Trim().Equals("Up", StringComparison.OrdinalIgnoreCase)) ? "bg-success" : "bg-danger";
+                                    <span class="badge @statusClass">@vm.LinkStatus</span>
+                                }
+                            </td>
                             <td>@vm.LinkSpeed</td>
                             <td>@vm.NicID</td>
                             <td><code>@vm.BakirMAC</code></td>
@@ -108,155 +135,93 @@
     </div>
 </div>
 
-<div class="card shadow-sm" id="virtualConnectionsCard" style="display: none;">
-    <div class="card-header bg-info-subtle"><h4 class="mb-0"><i class="fas fa-cloud me-2"></i>Sanal Bağlantılar (@virtualConnections.Count)</h4></div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table id="sanalBaglantiTablosu" class="table table-striped table-bordered table-sm filterable-table" style="width:100%">
-                <thead><tr><th>Kaynak Cihaz</th><th>Kaynak Port (Sanal)</th><th>Bağlantı Türü</th><th>Hedef Cihaz</th><th>Hedef Port (Fiziksel)</th><th class="text-center no-sort no-filter">İşlemler</th></tr></thead>
-                <tbody>
-                    @foreach (var vm in virtualConnections)
-                    {
-                        <tr>
-                            <td><a asp-controller="Envanter" asp-action="Details" asp-route-id="@vm.SourceDeviceID">@vm.SourceDeviceName</a></td>
-                            <td><span class="badge bg-info">@vm.SourcePort</span></td>
-                            <td>@vm.ConnectionType</td>
-                            <td><a asp-controller="Envanter" asp-action="Details" asp-route-id="@vm.TargetDeviceID">@vm.TargetDeviceName</a></td>
-                            <td><span class="badge bg-secondary">@vm.TargetPort</span></td>
-                            <td class="text-center"><div class="btn-group btn-group-sm"><a asp-controller="Baglanti" asp-action="Delete" asp-route-id="@vm.BaglantiID" class="btn btn-outline-danger" title="Sanal Bağlantıyı Sil"><i class="fas fa-trash-alt"></i></a></div></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="manualConnectionModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <form asp-controller="Baglanti" asp-action="Create" method="post">
-                <div class="modal-header">
-                    <h5 class="modal-title">Manuel Bağlantı Oluştur</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="modal-form-row-wrapper">
-                        <div class="mb-3"><label class="form-label fw-bold">1. Kaynak Cihaz</label><select id="sourceDeviceSelect" name="SourceDeviceID" class="form-select" required><option value="">-- Cihaz Seçin --</option>@foreach(var device in ViewBag.AllDevices as List<BLBM_ENV.Models.Envanter>) {
-                        <option value="@device.ID" data-tur="@device.Tur">@device.DeviceName</option>
-                                                }
-</select></div>
-                        <div class="mb-3 modal-form-step" id="modalKaynakPortContainer"><label class="form-label fw-bold">2. Kaynak Port</label><input type="text" id="modalKaynakPortInput" name="Source_Port" class="form-control" required /></div>
-                        <div class="mb-3 modal-form-step" id="modalTargetTypeContainer"><label class="form-label fw-bold">3. Hedef Cihaz Türü</label><select id="modalTargetDeviceTypeFilter" class="form-select"><option value="">-- Tüm Türler --</option><option value="NW Switch">NW Switch</option><option value="SAN Switch">SAN Switch</option><option value="Server">Server</option><option value="Storage">Storage</option></select></div>
-                        <div class="mb-3 modal-form-step" id="modalTargetDeviceContainer"><label class="form-label fw-bold">4. Hedef Cihaz</label><select id="modalTargetDeviceSelect" name="TargetDeviceID" class="form-select" required></select></div>
-                        <div class="mb-3 modal-form-step" id="modalHedefPortContainer"><label class="form-label fw-bold">5. Hedef Port</label><input type="text" id="modalHedefPortInput" name="Target_Port" class="form-control" required /></div>
-                        <div class="mb-3 modal-form-step" id="modalConnectionTypeContainer">
-                            <label class="form-label fw-bold">6. Bağlantı Türü</label>
-                            <select name="ConnectionType" id="modalConnectionTypeSelect" class="form-select">
-                                <option value="">-- Tür Seçin --</option>
-                                <option value="FC">FC</option>
-                                <option value="Bakır">Bakır</option>
-                                <option value="Virtual FC">Virtual FC</option>
-                                <option value="Virtual Bakır">Virtual Bakır</option>
-                            </select>
-                        </div>
-                        <div class="modal-conditional-field" id="modalSourceDetailWrapper"><label class="form-label fw-bold" id="modalSourceDetailLabel"></label><input type="text" id="modalSourceDetailInput" class="form-control" /></div>
-                        <div class="modal-conditional-field" id="modalTargetDetailWrapper"><label class="form-label fw-bold" id="modalTargetDetailLabel"></label><input type="text" id="modalTargetDetailInput" class="form-control" /></div>
-                        <div class="mb-3 modal-form-step" id="modalLinkDetailsContainer">
-                            <label class="form-label fw-bold">Link Durumu</label><select name="Source_LinkStatus" class="form-select mb-2"><option value="Up">Up</option><option value="Down">Down</option></select>
-                            <label class="form-label fw-bold">Link Hızı</label><input type="text" name="Source_LinkSpeed" class="form-control" />
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                    <button type="submit" class="btn btn-primary modal-form-step" id="modalCreateConnectionBtn"><i class="fas fa-plus me-1"></i> Oluştur</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-#region Diğer Modallar
-<div class="modal fade" id="physicalImportModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><form asp-controller="Baglanti" asp-action="ImportFromExcel" method="post" enctype="multipart/form-data"><div class="modal-header"><h5 class="modal-title">Standart Bağlantı Listesi Yükle</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="mb-3"><label class="form-label">Excel Dosyası (.xlsx)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx" required></div><hr /><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="deleteAll" value="true" id="deleteAllPhysical"><label class="form-check-label fw-bold" for="deleteAllPhysical">Mevcut Kayıtları Sil ve Yükle</label></div><div class="alert alert-danger mt-2"><strong>Dikkat:</strong> Bu seçeneği işaretlerseniz, veritabanındaki <strong>tüm bağlantı ve port detay kayıtları kalıcı olarak silinecektir!</strong></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-success"><i class="fas fa-upload me-1"></i> Yükle</button></div></form></div></div></div>
-<div class="modal fade" id="virtualImportModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><form asp-controller="Baglanti" asp-action="ImportVirtualPathFromExcel" method="post" enctype="multipart/form-data"><div class="modal-header"><h5 class="modal-title">Sanal Yol Haritası Yükle</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Bu seçenek, sanal yolları fiziksel bağlantılar üzerinden çözümleyerek oluşturur.</p><div class="mb-3"><label class="form-label">Excel Dosyası (.xlsx)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx" required></div><hr /><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="deleteVirtuals" value="true" id="deleteVirtualsSwitch"><label class="form-check-label fw-bold" for="deleteVirtualsSwitch">Mevcut Sanal Bağlantıları Sil ve Yükle</label></div><div class="alert alert-danger mt-2"><strong>Dikkat:</strong> Bu seçeneği işaretlerseniz, yükleme yapmadan önce veritabanındaki <strong>türü "Virtual" ile başlayan tüm bağlantı kayıtları kalıcı olarak silinecektir!</strong></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-info"><i class="fas fa-magic me-1"></i> İşle ve Yükle</button></div></form></div></div></div>
-#endregion
+<div class="modal fade" id="addConnectionChoiceModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Bağlantı Ekleme Yöntemini Seçin</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="row"><div class="col-md-4"><div class="selection-card" data-bs-toggle="modal" data-bs-target="#manualConnectionModal"><i class="fas fa-keyboard mb-3"></i><h6 class="mb-0">Manuel Bağlantı Ekle</h6></div></div><div class="col-md-4"><div class="selection-card" data-bs-toggle="modal" data-bs-target="#physicalImportModal"><i class="fas fa-file-excel mb-3"></i><h6 class="mb-0">Standart Yükleme</h6></div></div><div class="col-md-4"><div class="selection-card" data-bs-toggle="modal" data-bs-target="#virtualImportModal"><i class="fas fa-magic mb-3"></i><h6 class="mb-0">Sanal Yol Haritası</h6></div></div></div></div></div></div></div>
+<div class="modal fade" id="manualConnectionModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-xl"><div class="modal-content"><form asp-controller="Baglanti" asp-action="Create" method="post"><div class="modal-header"><h5 class="modal-title">Manuel Bağlantı Oluştur</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="modal-form-row-wrapper"><div class="mb-3"><label class="form-label fw-bold">1. Kaynak Cihaz</label><select id="sourceDeviceSelect" name="SourceDeviceID" class="form-select" required><option value="">-- Cihaz Seçin --</option>@foreach(var device in ViewBag.AllDevices as List<BLBM_ENV.Models.Envanter>) {
+<option value="@device.ID" data-tur="@device.Tur">@device.DeviceName</option>
+}
+</select></div><div class="mb-3 modal-form-step" id="modalKaynakPortContainer"><label class="form-label fw-bold">2. Kaynak Port</label><input type="text" id="modalKaynakPortInput" name="Source_Port" class="form-control" required /></div><div class="mb-3 modal-form-step" id="modalTargetTypeContainer"><label class="form-label fw-bold">3. Hedef Cihaz Türü</label><select id="modalTargetDeviceTypeFilter" class="form-select"><option value="">-- Tüm Türler --</option><option value="NW Switch">NW Switch</option><option value="SAN Switch">SAN Switch</option><option value="Server">Server</option><option value="Storage">Storage</option></select></div><div class="mb-3 modal-form-step" id="modalTargetDeviceContainer"><label class="form-label fw-bold">4. Hedef Cihaz</label><select id="modalTargetDeviceSelect" name="TargetDeviceID" class="form-select" required></select></div><div class="mb-3 modal-form-step" id="modalHedefPortContainer"><label class="form-label fw-bold">5. Hedef Port</label><input type="text" id="modalHedefPortInput" name="Target_Port" class="form-control" required /></div><div class="mb-3 modal-form-step" id="modalConnectionTypeContainer"><label class="form-label fw-bold">6. Bağlantı Türü</label><select name="ConnectionType" id="modalConnectionTypeSelect" class="form-select"><option value="">-- Tür Seçin --</option><option value="FC">FC</option><option value="Bakır">Bakır</option><option value="Virtual FC">Virtual FC</option><option value="Virtual Bakır">Virtual Bakır</option></select></div><div class="modal-conditional-field" id="modalSourceDetailWrapper"><label class="form-label fw-bold" id="modalSourceDetailLabel"></label><input type="text" id="modalSourceDetailInput" class="form-control" /></div><div class="modal-conditional-field" id="modalTargetDetailWrapper"><label class="form-label fw-bold" id="modalTargetDetailLabel"></label><input type="text" id="modalTargetDetailInput" class="form-control" /></div><div class="mb-3 modal-form-step" id="modalLinkDetailsContainer"><label class="form-label fw-bold">Link Durumu</label><select name="Source_LinkStatus" class="form-select mb-2"><option value="Up">Up</option><option value="Down">Down</option></select><label class="form-label fw-bold">Link Hızı</label><input type="text" name="Source_LinkSpeed" class="form-control" /></div></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-primary modal-form-step" id="modalCreateConnectionBtn"><i class="fas fa-plus me-1"></i> Oluştur</button></div></form></div></div></div>
+<div class="modal fade" id="physicalImportModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><form asp-controller="Baglanti" asp-action="ImportFromExcel" method="post" enctype="multipart/form-data"><div class="modal-header"><h5 class="modal-title">Standart Bağlantı Listesi Yükle</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="mb-3"><label class="form-label">Excel veya CSV Dosyası (.xlsx, .csv)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx,.csv" required></div><hr /><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="deleteAll" value="true" id="deleteAllPhysical"><label class="form-check-label fw-bold" for="deleteAllPhysical">Mevcut Kayıtları Sil ve Yükle</label></div><div class="alert alert-danger mt-2"><strong>Dikkat:</strong> Bu seçeneği işaretlerseniz, veritabanındaki <strong>tüm bağlantı kayıtları kalıcı olarak silinecektir!</strong></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-success"><i class="fas fa-upload me-1"></i> Yükle</button></div></form></div></div></div>
+<div class="modal fade" id="virtualImportModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><form asp-controller="Baglanti" asp-action="ImportVirtualPathFromExcel" method="post" enctype="multipart/form-data"><div class="modal-header"><h5 class="modal-title">Sanal Yol Haritası Yükle</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Bu seçenek, sanal yolları fiziksel bağlantılar üzerinden çözümleyerek oluşturur.</p><div class="mb-3"><label class="form-label">Excel veya CSV Dosyası (.xlsx, .csv)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx,.csv" required></div><hr /><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="deleteVirtuals" value="true" id="deleteVirtualsSwitch"><label class="form-check-label fw-bold" for="deleteVirtualsSwitch">Mevcut Sanal Bağlantıları Sil ve Yükle</label></div><div class="alert alert-danger mt-2"><strong>Dikkat:</strong> Bu seçeneği işaretlerseniz, yükleme yapmadan önce veritabanındaki <strong>türü "Virtual" ile başlayan tüm bağlantı kayıtları kalıcı olarak silinecektir!</strong></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-info"><i class="fas fa-magic me-1"></i> İşle ve Yükle</button></div></form></div></div></div>
 
 @section Scripts {
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function () {
-            #region DataTables
-            $('body').append('<div class="dt-filter-dropdown" style="display:none;"></div>');
-            var dropdown = $('.dt-filter-dropdown');
-            var tables = {};
-            $('.filterable-table').each(function() {
-                var tableId = $(this).attr('id');
-                var table = $(this).DataTable({ "ordering": false, pageLength: -1, lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"] ], language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json' }, columnDefs: [ { "targets": 'no-sort no-filter', "orderable": false }, { "targets": "_all", "render": function(data, type, row) { if (type === 'filter' || type === 'sort') { return $('<div>').html(data).text().trim(); } return data; } } ], initComplete: function () { this.api().columns().every(function () { var column = this; var header = $(column.header()); if (header.hasClass('no-filter') || header.text().trim() === 'İşlemler') return; header.append('<i class="fas fa-filter filter-icon"></i>'); }); } });
-                tables[tableId] = table;
+            var table = $('#baglantiTablosu').DataTable({
+                ordering: false,
+                pageLength: 25,
+                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"] ],
+                language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json' },
+                columnDefs: [ { "targets": 'no-filter', "searchable": false } ],
+                initComplete: function () {
+                    this.api().columns().every(function () {
+                        var column = this;
+                        var header = $(column.header());
+                        if (header.hasClass('no-filter')) return;
+                        var originalTitle = header.html();
+                        header.html(`<div class="d-flex justify-content-between align-items-center"><span class="header-text">${originalTitle}</span><i class="fas fa-search search-icon"></i></div>`);
+                    });
+                }
             });
-            $('.filterable-table thead').on('click', '.filter-icon', function (e) {
+
+            $('.view-filter-btn').on('click', function(e) {
+                e.preventDefault();
+                var filter = $(this).data('filter');
+                $.fn.dataTable.ext.search.pop();
+                if (filter !== 'all') {
+                    $.fn.dataTable.ext.search.push(
+                        function(settings, data, dataIndex) {
+                            var type = $(table.row(dataIndex).node()).data('connection-type');
+                            return type === filter;
+                        }
+                    );
+                }
+                table.draw();
+            });
+
+            $('#baglantiTablosu thead').on('click', '.search-icon', function (e) {
                 e.stopPropagation();
-                var icon = $(this);
-                var header = icon.parent();
-                var tableId = header.closest('table').attr('id');
-                var table = tables[tableId];
-                var columnIndex = header.index();
-                var column = table.column(columnIndex);
-                var currentSearch = column.search();
-                var content = `<input type="text" class="form-control form-control-sm mb-2 dropdown-search" placeholder="Seçeneklerde ara..."><div class="d-flex justify-content-between mb-2"><button class="btn btn-sm btn-outline-primary select-all">Tümünü Seç</button><button class="btn btn-sm btn-outline-secondary clear-filter">Filtreyi Temizle</button></div><div class="dt-filter-list"></div>`;
-                dropdown.html(content).data('tableId', tableId).data('columnIndex', columnIndex);
-                var uniqueValues = [];
-                var hasBlanks = false;
-                column.data().unique().sort().each(function (d, j) { var val = d ? d.toString().trim() : ""; if (val) { if (uniqueValues.indexOf(val) === -1) uniqueValues.push(val); } else { hasBlanks = true; } });
-                var searchTerms = currentSearch ? currentSearch.replace(/(^\^|\$$|\\\|)/g, '').split('|') : [];
-                dropdown.find('.dt-filter-list').append(`<div class="form-check dt-filter-item"><input class="form-check-input select-all-checkbox" type="checkbox"><label class="form-check-label fw-bold">(Tümünü Seç)</label></div><hr class="my-1">`);
-                uniqueValues.forEach(function (value, j) { var isChecked = !currentSearch || searchTerms.includes(value); dropdown.find('.dt-filter-list').append(`<div class="form-check dt-filter-item"><input class="form-check-input filter-checkbox" type="checkbox" value="${value}" ${isChecked ? 'checked' : ''}><label class="form-check-label">${value}</label></div>`); });
-                if(hasBlanks){ var isBlanksChecked = !currentSearch || searchTerms.includes("^$"); dropdown.find('.dt-filter-list').append(`<div class="form-check dt-filter-item"><input class="form-check-input filter-checkbox-blank" type="checkbox" ${isBlanksChecked ? 'checked' : ''}><label class="form-check-label fst-italic">(Boş Olanlar)</label></div>`); }
-                updateSelectAllCheckboxState(dropdown);
-                var pos = icon.offset();
-                var dropdownWidth = dropdown.outerWidth();
-                var windowWidth = $(window).width();
-                var proposedLeft = pos.left - dropdownWidth + icon.outerWidth();
-                if (proposedLeft + dropdownWidth > windowWidth) { proposedLeft = windowWidth - dropdownWidth - 15; }
-                if (proposedLeft < 0) { proposedLeft = 15; }
-                dropdown.css({ top: pos.top + icon.outerHeight(), left: proposedLeft, display: 'block' });
+                var header = $(this).closest('th');
+                closeAllSearchInputs();
+                var headerTextSpan = header.find('.header-text');
+                var originalTitle = headerTextSpan.text().trim();
+                var searchInput = $(`<input type="text" class="form-control form-control-sm column-search" placeholder="${originalTitle} içinde ara...">`);
+                headerTextSpan.html(searchInput);
+                $(this).hide();
+                searchInput.focus();
             });
-            function applyFilter(dropdown) {
-                var tableId = dropdown.data('tableId');
-                var column = tables[tableId].column(dropdown.data('columnIndex'));
-                var checkedValues = [];
-                dropdown.find('.filter-checkbox:checked').each(function() { checkedValues.push($(this).val()); });
-                var blankIsChecked = dropdown.find('.filter-checkbox-blank').is(':checked');
-                var totalOptions = dropdown.find('.filter-checkbox').length + (dropdown.find('.filter-checkbox-blank').length > 0 ? 1 : 0);
-                var selectedOptions = checkedValues.length + (blankIsChecked ? 1 : 0);
-                if(selectedOptions === 0 || selectedOptions === totalOptions) { column.search('').draw(); } else { var regexParts = checkedValues.map(v => `^${v.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}$`); if(blankIsChecked) { regexParts.push("^$"); } column.search(regexParts.join('|'), true, false).draw(); }
-                $(column.header()).find('.filter-icon').toggleClass('active', !!column.search());
-                updateSelectAllCheckboxState(dropdown);
-            }
-            function updateSelectAllCheckboxState(dropdown) {
-                 var allValueCheckboxes = dropdown.find('.filter-checkbox, .filter-checkbox-blank');
-                 var checkedValueCheckboxes = allValueCheckboxes.filter(':checked');
-                 var selectAll = dropdown.find('.select-all-checkbox');
-                 if (allValueCheckboxes.length > 0 && allValueCheckboxes.length === checkedValueCheckboxes.length) { selectAll.prop('checked', true).prop('indeterminate', false); } else if (checkedValueCheckboxes.length > 0) { selectAll.prop('checked', false).prop('indeterminate', true); } else { selectAll.prop('checked', false).prop('indeterminate', false); }
-            }
-            $(document).on('change', '.select-all-checkbox', function() { var dropdown = $(this).closest('.dt-filter-dropdown'); dropdown.find('.filter-checkbox:visible, .filter-checkbox-blank:visible').prop('checked', $(this).is(':checked')); applyFilter(dropdown); });
-            $(document).on('click', '.select-all', function() { $(this).closest('.dt-filter-dropdown').find('.select-all-checkbox').prop('checked', true).trigger('change'); });
-            $(document).on('click', '.clear-filter', function() { $(this).closest('.dt-filter-dropdown').find('.select-all-checkbox').prop('checked', false).trigger('change'); });
-            $(document).on('change', '.filter-checkbox, .filter-checkbox-blank', function () { applyFilter($(this).closest('.dt-filter-dropdown')); });
-            $(document).on('keyup', '.dropdown-search', function() { var searchTerm = $(this).val().toLowerCase(); $(this).closest('.dt-filter-dropdown').find('.dt-filter-item').each(function() { if(!$(this).find('.select-all-checkbox').length > 0){ $(this).toggle($(this).find('label').text().toLowerCase().includes(searchTerm)); } }); });
-            $(document).on('click', function (e) { if (!$(e.target).closest('.dt-filter-dropdown, .filter-icon').length) { $('.dt-filter-dropdown').hide(); } });
-            #endregion
 
-            $('#toggleVirtualsBtn').on('click', function() { $('#virtualConnectionsCard').slideToggle(); });
+            $('#baglantiTablosu thead').on('keyup', 'input.column-search', function (e) {
+                e.stopPropagation();
+                var columnIndex = $(this).closest('th').index();
+                table.column(columnIndex).search(this.value).draw();
+            });
 
-            // --- GÜNCELLENDİ: Modal için sıfırdan yazılmış, daha sağlam JavaScript mantığı ---
+            function closeAllSearchInputs() {
+                $('#baglantiTablosu thead th').each(function() {
+                    var header = $(this);
+                    if (header.find('input.column-search').length > 0) {
+                        var originalTitle = header.find('input.column-search').attr('placeholder').replace(' içinde ara...', '');
+                        header.find('.header-text').html(originalTitle);
+                        header.find('.search-icon').show();
+                    }
+                });
+            }
+
+            $(document).on('click', function(e) {
+                if (!$(e.target).is("input.column-search") && !$(e.target).is(".search-icon")) {
+                    closeAllSearchInputs();
+                }
+            });
+
+            $('#baglantiTablosu tbody').on('click', 'tr', function (e) {
+                if ($(e.target).is('a, button, i')) { return; }
+                var detailsLink = $(this).find('a').first();
+                if (detailsLink.length > 0) { window.location.href = detailsLink.attr('href'); }
+            });
+
             const allConnections = @Html.Raw(allConnectionsJson);
             const allDeviceOptions = @Html.Raw(JsonSerializer.Serialize((ViewBag.AllDevices as List<BLBM_ENV.Models.Envanter>).Select(d => new { id = d.ID, name = d.DeviceName, tur = d.Tur })));
-
             const modalForm = $('#manualConnectionModal');
-
             function updateModalFormState() {
                 const sourceDeviceVal = modalForm.find('#sourceDeviceSelect').val();
                 const kaynakPortVal = modalForm.find('#modalKaynakPortInput').val().trim();
@@ -264,13 +229,11 @@
                 const targetDeviceVal = modalForm.find('#modalTargetDeviceSelect').val();
                 const hedefPortVal = modalForm.find('#modalHedefPortInput').val().trim();
                 const connectionTypeVal = modalForm.find('#modalConnectionTypeSelect').val();
-
                 toggleModalElement('#modalKaynakPortContainer', !!sourceDeviceVal);
                 toggleModalElement('#modalTargetTypeContainer', !!kaynakPortVal);
                 toggleModalElement('#modalTargetDeviceContainer', !!targetTypeVal);
                 toggleModalElement('#modalHedefPortContainer', !!targetDeviceVal);
                 toggleModalElement('#modalConnectionTypeContainer', !!hedefPortVal);
-
                 let shouldShowDetails = false;
                 if (connectionTypeVal) {
                     const sourceDeviceType = modalForm.find('#sourceDeviceSelect option:selected').data('tur');
@@ -278,11 +241,7 @@
                     switch (connectionTypeVal) {
                         case 'FC':
                             shouldShowDetails = true;
-                            if (sourceDeviceType === 'SAN Switch' || targetDeviceType === 'SAN Switch') {
-                                updateModalFields('WWPN', 'Source_WWPN', 'Target_WWPN');
-                            } else {
-                                updateModalFields('Fiber MAC', 'Source_FiberMAC', 'Target_FiberMAC');
-                            }
+                            if (sourceDeviceType === 'SAN Switch' || targetDeviceType === 'SAN Switch') { updateModalFields('WWPN', 'Source_WWPN', 'Target_WWPN'); } else { updateModalFields('Fiber MAC', 'Source_FiberMAC', 'Target_FiberMAC'); }
                             break;
                         case 'Bakır':
                             shouldShowDetails = true;
@@ -298,43 +257,33 @@
                             break;
                     }
                 }
-
                 toggleModalElement('#modalSourceDetailWrapper', shouldShowDetails);
                 toggleModalElement('#modalTargetDetailWrapper', shouldShowDetails);
                 toggleModalElement('#modalLinkDetailsContainer', shouldShowDetails);
                 toggleModalElement('#modalCreateConnectionBtn', shouldShowDetails);
             }
-
             function toggleModalElement(selector, show) {
                 const element = modalForm.find(selector);
                 if (show && !element.is(':visible')) { element.fadeIn('fast'); }
                 else if (!show && element.is(':visible')) { element.fadeOut('fast'); }
             }
-
             function updateModalFields(labelText, sourceName, targetName) {
                 modalForm.find('#modalSourceDetailLabel').text(`Kaynak ${labelText}`);
                 modalForm.find('#modalSourceDetailInput').attr('name', sourceName);
                 modalForm.find('#modalTargetDetailLabel').text(`Hedef ${labelText}`);
                 modalForm.find('#modalTargetDetailInput').attr('name', targetName);
             }
-
-            // Olay delegasyonu ile daha sağlam olay dinleyicileri
             modalForm.on('change', '#sourceDeviceSelect, #modalTargetDeviceSelect, #modalConnectionTypeSelect', updateModalFormState);
             modalForm.on('input', '#modalKaynakPortInput, #modalHedefPortInput', updateModalFormState);
-
             modalForm.on('change', '#modalTargetDeviceTypeFilter', function() {
                 const selectedType = $(this).val();
                 const sourceDeviceId = modalForm.find('#sourceDeviceSelect').val();
                 const targetDeviceSelect = modalForm.find('#modalTargetDeviceSelect');
-
                 targetDeviceSelect.empty().append('<option value="">-- Cihaz Seçin --</option>');
-
                 const filteredDevices = allDeviceOptions.filter(d => (selectedType === "" || d.tur === selectedType) && d.id != sourceDeviceId);
-
                 $.each(filteredDevices, function(i, device) {
                     targetDeviceSelect.append($('<option>', { value: device.id, 'data-tur': device.tur, text: device.name }));
                 });
-
                 targetDeviceSelect.val('');
                 updateModalFormState();
             });

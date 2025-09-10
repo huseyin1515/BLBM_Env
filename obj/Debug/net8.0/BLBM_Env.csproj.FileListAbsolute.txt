@@ -357,3 +357,5 @@ C:\Users\husey\source\repos\BLBM_Env\obj\Debug\net8.0\refint\BLBM_Env.dll
 C:\Users\husey\source\repos\BLBM_Env\obj\Debug\net8.0\BLBM_Env.pdb
 C:\Users\husey\source\repos\BLBM_Env\obj\Debug\net8.0\BLBM_Env.genruntimeconfig.cache
 C:\Users\husey\source\repos\BLBM_Env\obj\Debug\net8.0\ref\BLBM_Env.dll
+C:\Users\ASUS\source\repos\BLBM_Env\obj\Debug\net8.0\BLBM_Env.sourcelink.json
+C:\Users\ASUS\source\repos\BLBM_Env\bin\Debug\net8.0\CsvHelper.dll

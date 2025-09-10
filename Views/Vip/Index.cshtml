@@ -17,17 +17,26 @@
     <div class="alert alert-info alert-dismissible fade show" role="alert">@Html.Raw(TempData["InfoMessage"])<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
 }
 
-<div class="card shadow-sm">
-    <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">@ViewData["Title"]</h4>
-            <div class="btn-group">
-                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#detailImportModal"><i class="fas fa-database me-1"></i> Veri Zenginleştir</button>
-                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#resolveImportModal"><i class="fas fa-magic me-1"></i> DNS ile Otomatik Bul</button>
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#standardImportModal"><i class="fas fa-file-excel me-1"></i> Standart Yükleme</button>
-            </div>
+<div class="page-header">
+    <h1 class="page-title">@ViewData["Title"]</h1>
+    <div class="btn-group">
+        <!-- YENİ EKLENDİ: Dışa Aktar Butonu -->
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="exportOptionsBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-file-export me-1"></i> Dışa Aktar
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="exportOptionsBtn">
+                <li><a class="dropdown-item" asp-action="ExportToExcel"><i class="fas fa-file-excel me-2 text-success"></i>Excel Olarak Aktar (.xlsx)</a></li>
+                <li><a class="dropdown-item" asp-action="ExportToCsv"><i class="fas fa-file-csv me-2 text-secondary"></i>CSV Olarak Aktar (.csv)</a></li>
+            </ul>
         </div>
+        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#detailImportModal"><i class="fas fa-database me-1"></i> Veri Zenginleştir</button>
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#resolveImportModal"><i class="fas fa-magic me-1"></i> DNS ile Otomatik Bul</button>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#standardImportModal"><i class="fas fa-file-excel me-1"></i> Standart Yükleme</button>
     </div>
+</div>
+
+<div class="card shadow-sm">
     <div class="card-body">
         <div class="table-responsive">
             <table id="vipTablosu" class="table table-striped table-bordered table-sm" style="width:100%">
@@ -43,28 +52,66 @@
     </div>
 </div>
 
-<div class="modal fade" id="standardImportModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog"><div class="modal-content"><form asp-controller="Vip" asp-action="ImportStandardExcel" method="post" enctype="multipart/form-data"><div class="modal-header"><h5 class="modal-title">Standart Excel Yüklemesi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Bu seçenek, tüm sütunların bulunduğu standart bir Excel dosyasını doğrudan yükler.</p><div class="mb-3"><label class="form-label">Excel Dosyası (.xlsx)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx" required></div><hr /><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="deleteAll" value="true" id="deleteAllSwitchStd"><label class="form-check-label fw-bold" for="deleteAllSwitchStd">Mevcut Kayıtları Sil ve Yükle</label></div><div class="alert alert-danger mt-2"><strong>Dikkat:</strong> Bu seçeneği işaretlerseniz, veritabanındaki <strong>tüm VIP kayıtları kalıcı olarak silinecektir!</strong></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-success"><i class="fas fa-upload me-1"></i> Yükle</button></div></form></div></div>
-</div>
-
-<div class="modal fade" id="resolveImportModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog"><div class="modal-content"><form asp-controller="Vip" asp-action="ImportAndResolveFromExcel" method="post" enctype="multipart/form-data" id="resolveImportForm"><div class="modal-header"><h5 class="modal-title">DNS Çözümleme ile Ham Veri Yükle</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Bu seçenek, Excel'deki DNS adlarını <strong>nslookup</strong> ile çözümleyerek VIP IP'leri otomatik olarak bulur.</p><div class="mb-3"><label class="form-label">Ham Veri Excel Dosyası (.xlsx)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx" required></div><hr /><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="deleteAll" value="true" id="deleteAllSwitchResolve"><label class="form-check-label fw-bold" for="deleteAllSwitchResolve">Mevcut Kayıtları Sil ve Yükle</label></div><div class="alert alert-danger mt-2"><strong>Dikkat:</strong> Bu seçeneği işaretlerseniz, veritabanındaki <strong>tüm VIP kayıtları kalıcı olarak silinecektir!</strong></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-info"><i class="fas fa-magic me-1"></i> İşle ve Yükle</button></div></form></div></div>
-</div>
-
-<div class="modal fade" id="detailImportModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog"><div class="modal-content"><form asp-controller="Vip" asp-action="UpdateVipsFromDetailExcel" method="post" enctype="multipart/form-data"><div class="modal-header"><h5 class="modal-title">Detay Excel'i ile Veri Zenginleştir</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Bu seçenek, mevcut VIP listesindeki boş alanları, yükleyeceğiniz Excel'deki <strong>Makine IP</strong> eşleşmesine göre doldurur.</p><div class="alert alert-info"><strong>Excel Formatı:</strong><br>Sütun 3: Primary IP Address (Eşleştirme için)<br>...ve diğerleri</div><div class="mb-3"><label class="form-label">Detay Excel Dosyası (.xlsx)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx" required></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-warning"><i class="fas fa-database me-1"></i> Güncelle ve Zenginleştir</button></div></form></div></div>
-</div>
+#region Modallar
+<div class="modal fade" id="standardImportModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><form asp-controller="Vip" asp-action="ImportStandardExcel" method="post" enctype="multipart/form-data"><div class="modal-header"><h5 class="modal-title">Standart Excel Yüklemesi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Bu seçenek, tüm sütunların bulunduğu standart bir Excel dosyasını doğrudan yükler.</p><div class="mb-3"><label class="form-label">Excel veya CSV Dosyası (.xlsx, .csv)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx,.csv" required></div><hr /><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="deleteAll" value="true" id="deleteAllSwitchStd"><label class="form-check-label fw-bold" for="deleteAllSwitchStd">Mevcut Kayıtları Sil ve Yükle</label></div><div class="alert alert-danger mt-2"><strong>Dikkat:</strong> Bu seçeneği işaretlerseniz, veritabanındaki <strong>tüm VIP kayıtları kalıcı olarak silinecektir!</strong></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-success"><i class="fas fa-upload me-1"></i> Yükle</button></div></form></div></div></div>
+<div class="modal fade" id="resolveImportModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><form asp-controller="Vip" asp-action="ImportAndResolveFromExcel" method="post" enctype="multipart/form-data" id="resolveImportForm"><div class="modal-header"><h5 class="modal-title">DNS Çözümleme ile Ham Veri Yükle</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Bu seçenek, Excel'deki DNS adlarını <strong>nslookup</strong> ile çözümleyerek VIP IP'leri otomatik olarak bulur.</p><div class="mb-3"><label class="form-label">Ham Veri Excel Dosyası (.xlsx)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx" required></div><hr /><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="deleteAll" value="true" id="deleteAllSwitchResolve"><label class="form-check-label fw-bold" for="deleteAllSwitchResolve">Mevcut Kayıtları Sil ve Yükle</label></div><div class="alert alert-danger mt-2"><strong>Dikkat:</strong> Bu seçeneği işaretlerseniz, veritabanındaki <strong>tüm VIP kayıtları kalıcı olarak silinecektir!</strong></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-info"><i class="fas fa-magic me-1"></i> İşle ve Yükle</button></div></form></div></div></div>
+<div class="modal fade" id="detailImportModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><form asp-controller="Vip" asp-action="UpdateVipsFromDetailExcel" method="post" enctype="multipart/form-data"><div class="modal-header"><h5 class="modal-title">Detay Excel'i ile Veri Zenginleştir</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Bu seçenek, mevcut VIP listesindeki boş alanları, yükleyeceğiniz Excel'deki <strong>Makine IP</strong> eşleşmesine göre doldurur.</p><div class="alert alert-info"><strong>Excel Formatı:</strong><br>Sütun 3: Primary IP Address (Eşleştirme için)<br>...ve diğerleri</div><div class="mb-3"><label class="form-label">Detay Excel Dosyası (.xlsx)</label><input class="form-control" type="file" name="excelFile" accept=".xlsx" required></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-warning"><i class="fas fa-database me-1"></i> Güncelle ve Zenginleştir</button></div></form></div></div></div>
+#endregion
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#vipTablosu').DataTable({
+            var table = $('#vipTablosu').DataTable({
+                ordering: false,
                 pageLength: 25,
                 lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"] ],
-                language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json', }
+                language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json' },
+                initComplete: function () {
+                    this.api().columns().every(function () {
+                        var column = this;
+                        var header = $(column.header());
+                        if (header.hasClass('no-filter')) return;
+                        var originalTitle = header.html();
+                        header.html(`<div class="d-flex justify-content-between align-items-center"><span class="header-text">${originalTitle}</span><i class="fas fa-search search-icon"></i></div>`);
+                    });
+                }
             });
 
-            // Yükleme sırasında butonu kilitlemek için basit bir script
+            $('#vipTablosu thead').on('click', '.search-icon', function (e) {
+                e.stopPropagation();
+                var header = $(this).closest('th');
+                closeAllSearchInputs();
+                var headerTextSpan = header.find('.header-text');
+                var originalTitle = headerTextSpan.text().trim();
+                var searchInput = $(`<input type="text" class="form-control form-control-sm column-search" placeholder="${originalTitle} içinde ara...">`);
+                headerTextSpan.html(searchInput);
+                $(this).hide();
+                searchInput.focus();
+            });
+
+            $('#vipTablosu thead').on('keyup', 'input.column-search', function (e) {
+                e.stopPropagation();
+                var columnIndex = $(this).closest('th').index();
+                table.column(columnIndex).search(this.value).draw();
+            });
+
+            function closeAllSearchInputs() {
+                $('#vipTablosu thead th').each(function() {
+                    var header = $(this);
+                    if (header.find('input.column-search').length > 0) {
+                        var originalTitle = header.find('input.column-search').attr('placeholder').replace(' içinde ara...', '');
+                        header.find('.header-text').html(originalTitle);
+                        header.find('.search-icon').show();
+                    }
+                });
+            }
+
+            $(document).on('click', function(e) {
+                if (!$(e.target).is("input.column-search") && !$(e.target).is(".search-icon")) {
+                    closeAllSearchInputs();
+                }
+            });
+
             $('#resolveImportForm').on('submit', function() {
                 if ($(this).find('input[type=file]').val()) {
                     var btn = $(this).find('button[type=submit]');

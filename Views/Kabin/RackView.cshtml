@@ -1,239 +1,306 @@
-﻿@{
-    ViewData["Title"] = "Kabin Görünümü: " + ViewBag.Location;
+﻿@model BLBM_ENV.Models.RackVisualizationViewModel
+
+@{
+    ViewData["Title"] = "Kabin Görünümü";
+    var colorMap = new Dictionary<string, string>();
+    var colors = new List<string> { "#0d6efd", "#6f42c1", "#198754", "#dc3545", "#fd7e14", "#20c997", "#6c757d" };
+    int colorIndex = 0;
+    var highlightedServerId = Context.Request.Query["highlight"];
+
+    // --- GÜNCELLENDİ: Gruplama mantığı artık her zaman ön ve arka yüzü bulacak şekilde ---
+    var groupedRacks = Model.Racks
+        .Select(r => new { Name = r.Key.Replace(" (Ön)", "").Replace(" (Arka)", "") })
+        .Distinct()
+        .Select(g => g.Name)
+        .OrderBy(name => name)
+        .ToList();
 }
 
-<style>
-    body {
-        background-color: #f4f5f7;
-    }
-
-    .rack-view-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-
-    .rack-container-wrapper {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 30px;
-    }
-
-    @@media (max-width: 1400px) {
-        .rack-container-wrapper {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @@media (max-width: 768px) {
-        .rack-container-wrapper {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .rack-column {
-        min-width: 0;
-    }
-
-    .rack-title {
-        text-align: center;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 10px;
-    }
-
-    .rack-frame {
-        position: relative;
-        height: 714px;
-        background-color: #fff;
-        border: 1px solid #d1d5db;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
-        display: flex;
-        padding: 0 5px;
-    }
-
-    .device-area {
-        position: relative;
-        flex-grow: 1;
-        background-image: repeating-linear-gradient(#fff 0, #fff 16px, #f0f2f5 16px, #f0f2f5 17px);
-    }
-
-    .u-column {
-        width: 25px;
-        display: flex;
-        flex-direction: column-reverse;
-        text-align: center;
-        z-index: 2;
-    }
-
-    .u-number {
-        height: 17px;
-        font-size: 9px;
-        font-weight: 500;
-        color: #9ca3af;
-        line-height: 17px;
-        position: relative;
-    }
-
-    .u-column:first-child .u-number::after {
-        content: '';
-        position: absolute;
-        right: 0;
-        top: 50%;
-        height: 1px;
-        width: 5px;
-        background-color: #d1d5db;
-    }
-
-    .u-column:last-child .u-number::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        height: 1px;
-        width: 5px;
-        background-color: #d1d5db;
-    }
-
-    .rack-device {
-        position: absolute;
-        width: 100%;
-        box-sizing: border-box;
-        border: 1px solid;
-        border-radius: 3px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 2px 8px;
-        font-size: 11px;
-        color: white;
-        overflow: hidden;
-        white-space: nowrap;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1);
-        z-index: 5;
-        /* *** EFEKT İÇİN GEÇİŞ (TRANSITION) EKLENDİ *** */
-        transition: all 0.2s ease-in-out;
-    }
-
-        /* *** YENİ: İMLEÇ ÜZERİNE GELDİĞİNDE UYGULANACAK STİLLER *** */
-        .rack-device:hover {
-            z-index: 10; /* Diğer cihazların üzerine çıkması için */
-            transform: scale(1.05); /* %5 oranında büyüt */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Gölgeyi belirginleştir */
-        }
-
-    .device-name {
-        font-weight: 600;
-    }
-
-    .device-u-range {
-        font-size: 10px;
-        opacity: 0.9;
-        background-color: rgba(0,0,0,0.2);
-        padding: 1px 4px;
-        border-radius: 3px;
-    }
-
-    /* RENK PALETİ */
-    .rack-device[data-tur="Server"] {
-        background: linear-gradient(to bottom, #4f8ff7, #3b82f6);
-        border-color: #2563eb;
-    }
-
-    .rack-device[data-tur="NW Switch"] {
-        background: linear-gradient(to bottom, #12c289, #10b981);
-        border-color: #059669;
-    }
-
-    .rack-device[data-tur="SAN Switch"] {
-        background: linear-gradient(to bottom, #f25555, #ef4444);
-        border-color: #dc2626;
-    }
-
-    .rack-device[data-tur="Storage"] {
-        background: linear-gradient(to bottom, #f7ac2a, #f59e0b);
-        border-color: #d97706;
-        color: #1f2937;
-    }
-
-    .rack-device[data-tur="Firewall"] {
-        background: linear-gradient(to bottom, #7b52c7, #6f42c1);
-        border-color: #59359a;
-    }
-
-    .rack-device[data-tur="Belirsiz"] {
-        background: linear-gradient(to bottom, #85909c, #6c757d);
-        border-color: #565e64;
-    }
-
-</style>
-
-<div class="rack-view-header">
-    <h2 class="h4">Kabin Görünümü: <strong>@ViewBag.Location</strong></h2>
-    <a href="@Url.Action("Index", "Kabin")" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Lokasyon Değiştir</a>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="fas fa-th me-2"></i>@ViewData["Title"]: <span class="text-primary">@Model.SelectedLocation</span></h3>
+    <a asp-action="Index" class="btn btn-secondary">Lokasyon Değiştir</a>
 </div>
 
-<div id="rack-container" class="rack-container-wrapper">
-    <!-- Kabinler JavaScript ile buraya yüklenecek -->
+@if (!groupedRacks.Any())
+{
+    <div class="alert alert-warning">Seçili lokasyonda gösterilecek kabin verisi bulunamadı.</div>
+}
+
+<!-- GÜNCELLENDİ: Ana konteyner artık tüm kabinleri içeriyor -->
+<div class="rack-container">
+    @foreach (var cabinetName in groupedRacks)
+    {
+        var frontRackData = Model.Racks[cabinetName + " (Ön)"];
+        var rearRackData = Model.Racks[cabinetName + " (Arka)"];
+
+        <!-- ÖN KABİN -->
+        <div class="rack-wrapper">
+            <div class="rack-header">@cabinetName (Ön)</div>
+            <div class="rack">
+                <div class="rack-side left">@for (int j = 42; j >= 1; j--) {
+                <div class="u-hole">@j</div>
+            }
+</div>
+            <div class="rack-middle">
+                <div class="rack-units">
+                    @{
+                        var processedUnitsFront = new HashSet<int>();
+                        foreach (var unit in frontRackData.OrderByDescending(u => u.U_Number))
+                        {
+                            if (processedUnitsFront.Contains(unit.U_Number)) { continue; }
+                            if (unit.IsOccupied)
+                            {
+                                var serversInThisBlock = unit.OccupyingServers;
+                                var firstServer = serversInThisBlock.First();
+                                int uSpan = frontRackData.Count(u => u.IsOccupied && u.OccupyingServers.Any(s => s.ID == firstServer.ID));
+                                int height = (uSpan * 20) - 2;
+                                for (int u = unit.U_Number; u > unit.U_Number - uSpan; u--) { processedUnitsFront.Add(u); }
+
+                                <div class="server-block" style="height: @(height)px;">
+                                    @foreach (var server in serversInThisBlock.OrderBy(s => s.DeviceName))
+                                    {
+                                        if (!colorMap.ContainsKey(server.Model ?? "default")) { colorMap[server.Model ?? "default"] = colors[colorIndex++ % colors.Count]; }
+                                        string serverColor = colorMap[server.Model ?? "default"];
+                                        <div class="server-sub-block @(server.ID.ToString() == highlightedServerId ? "highlight-target" : "")" style="background-color: @serverColor;" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<strong>@server.DeviceName</strong><br>Model: @server.Model<br>U Aralığı: @server.KabinU">
+                                            <a asp-controller="Envanter" asp-action="Details" asp-route-id="@server.ID" class="server-link">
+                                                <span class="server-name">@server.DeviceName</span>
+                                                <span class="server-u">@server.KabinU</span>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="empty-unit"></div>
+                                processedUnitsFront.Add(unit.U_Number);
+                            }
+                        }
+                    }
+                </div>
+            </div>
+            <div class="rack-side right">@for (int j = 42; j >= 1; j--) {
+            <div class="u-hole">@j</div>
+                        }
+</div>
+        </div>
+    </div>
+
+    <!-- ARKA KABİN -->
+    <div class="rack-wrapper">
+        <div class="rack-header">@cabinetName (Arka)</div>
+        <div class="rack">
+            <div class="rack-side left">@for (int j = 42; j >= 1; j--) {
+            <div class="u-hole">@j</div>
+                        }
+</div>
+            <div class="rack-middle">
+                <div class="rack-units">
+                    @{
+                        var processedUnitsRear = new HashSet<int>();
+                        foreach (var unit in rearRackData.OrderByDescending(u => u.U_Number))
+                        {
+                            if (processedUnitsRear.Contains(unit.U_Number)) { continue; }
+                            if (unit.IsOccupied)
+                            {
+                                var serversInThisBlock = unit.OccupyingServers;
+                                var firstServer = serversInThisBlock.First();
+                                int uSpan = rearRackData.Count(u => u.IsOccupied && u.OccupyingServers.Any(s => s.ID == firstServer.ID));
+                                int height = (uSpan * 20) - 2;
+                                for (int u = unit.U_Number; u > unit.U_Number - uSpan; u--) { processedUnitsRear.Add(u); }
+
+                                <div class="server-block" style="height: @(height)px;">
+                                    @foreach (var server in serversInThisBlock.OrderBy(s => s.DeviceName))
+                                    {
+                                        if (!colorMap.ContainsKey(server.Model ?? "default")) { colorMap[server.Model ?? "default"] = colors[colorIndex++ % colors.Count]; }
+                                        string serverColor = colorMap[server.Model ?? "default"];
+                                        <div class="server-sub-block @(server.ID.ToString() == highlightedServerId ? "highlight-target" : "")" style="background-color: @serverColor;" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<strong>@server.DeviceName</strong><br>Model: @server.Model<br>U Aralığı: @server.KabinU">
+                                            <a asp-controller="Envanter" asp-action="Details" asp-route-id="@server.ID" class="server-link">
+                                                <span class="server-name">@server.DeviceName</span>
+                                                <span class="server-u">@server.KabinU</span>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="empty-unit"></div>
+                                processedUnitsRear.Add(unit.U_Number);
+                            }
+                        }
+                    }
+                </div>
+            </div>
+            <div class="rack-side right">@for (int j = 42; j >= 1; j--) {
+            <div class="u-hole">@j</div>
+                        }
+</div>
+        </div>
+    </div>
+        }
 </div>
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
-            const locationName = '@ViewBag.Location';
-            const container = $('#rack-container');
-            const totalU = 42;
-            const uHeight = 17;
-            const definedTurler = ["Server", "NW Switch", "SAN Switch", "Storage", "Firewall"];
-
-            $.getJSON(`/api/kabin/location/${locationName}`, function(kabinler) {
-                container.empty();
-                if (kabinler && kabinler.length > 0) {
-                    kabinler.forEach(function(kabin) {
-                        const kabinGroup = $('<div class="rack-column"></div>');
-                        kabinGroup.append(createRackColumn(kabin.kabinName, "(Ön)", kabin.frontDevices));
-                        container.append(kabinGroup);
-
-                        const kabinGroupArka = $('<div class="rack-column"></div>');
-                        kabinGroupArka.append(createRackColumn(kabin.kabinName, "(Arka)", kabin.rearDevices));
-                        container.append(kabinGroupArka);
-                    });
-                } else {
-                     container.html('<p class="text-muted text-center w-100">Bu lokasyonda gösterilecek kabin veya cihaz bulunamadı.</p>');
-                }
-            });
-
-            function createRackColumn(name, suffix, devices) {
-                const columnContent = $('<div></div>');
-                columnContent.append(`<div class="rack-title">${name} ${suffix}</div>`);
-
-                const frame = $('<div class="rack-frame"></div>');
-                const uColLeft = $('<div class="u-column"></div>'), deviceArea = $('<div class="device-area"></div>'), uColRight = $('<div class="u-column"></div>');
-
-                for (let i = 1; i <= totalU; i++) {
-                    uColLeft.append(`<div class="u-number">${i}</div>`);
-                    uColRight.append(`<div class="u-number">${i}</div>`);
-                }
-
-                devices.forEach(function(device) {
-                    const topPos = (totalU - device.startU - device.heightU + 1) * uHeight;
-                    const deviceTur = (device.tur && definedTurler.includes(device.tur)) ? device.tur : "Belirsiz";
-                    const deviceDiv = $(`
-                        <div class="rack-device" data-tur="${deviceTur}" style="top: ${topPos}px; height: ${device.heightU * uHeight}px;" title="${device.deviceName}">
-                            <span class="device-name">${device.deviceName}</span>
-                            <span class="device-u-range">${device.kabinU}</span>
-                        </div>
-                    `);
-                    deviceDiv.on('click', () => window.location.href = `/Envanter/Details/${device.id}`);
-                    deviceArea.append(deviceDiv);
-                });
-
-                frame.append(uColLeft, deviceArea, uColRight);
-                columnContent.append(frame);
-                return columnContent;
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const highlightedElement = document.querySelector('.highlight-target');
+            if (highlightedElement) {
+                highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                highlightedElement.classList.add('flash');
             }
         });
     </script>
+}
+
+@section Styles {
+    <style>
+        /* GÜNCELLENDİ: Ana konteyner artık Grid layout kullanıyor */
+        .rack-container {
+            display: grid;
+            /* Her satırda 4 kabin olacak şekilde ayarla */
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .rack-wrapper {
+            display: flex;
+            flex-direction: column;
+            width: 100%; /* Grid item'ı doldur */
+        }
+
+        .rack-header {
+            background-color: #343a40;
+            color: white;
+            padding: 8px 10px;
+            font-weight: bold;
+            text-align: center;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        .rack {
+            display: flex;
+            flex-grow: 1;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+
+        .rack-side {
+            background-color: #495057;
+            padding: 5px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .u-hole {
+            width: 25px;
+            height: 18px;
+            margin-bottom: 2px;
+            color: #adb5bd;
+            font-size: 10px;
+            text-align: center;
+            border-top: 1px solid #6c757d;
+            border-bottom: 1px solid #6c757d;
+        }
+
+        .rack-middle {
+            flex-grow: 1;
+        }
+
+        .rack-units {
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .empty-unit, .server-block {
+            margin-bottom: 2px;
+            box-sizing: border-box;
+        }
+
+        .empty-unit {
+            height: 18px;
+            background-image: linear-gradient(45deg, #e9ecef 25%, #dee2e6 25%, #dee2e6 50%, #e9ecef 50%, #e9ecef 75%, #dee2e6 75%, #dee2e6 100%);
+            background-size: 10px 10px;
+        }
+
+        .server-block {
+            display: flex;
+            flex-direction: column;
+            justify-content: stretch;
+            border: 1px solid rgba(0,0,0,0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .server-sub-block {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .server-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 0 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+            .server-link:hover {
+                background-color: rgba(0,0,0,0.2);
+            }
+
+        .server-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-grow: 1;
+        }
+
+        .server-u {
+            background-color: rgba(0,0,0,0.3);
+            padding: 0 4px;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+
+        .highlight-target.flash {
+            animation: pulse-glow-red 2s 2;
+        }
+
+        @@keyframes pulse-glow-red {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 15px 10px rgba(220, 53, 69, 0);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+    </style>
 }

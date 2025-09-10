@@ -5,39 +5,33 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Text.RegularExpressions;
 using ClosedXML.Excel;
+using CsvHelper;
+using System.Globalization;
 
 namespace BLBM_ENV.Controllers
 {
     public class NaturalStringComparer : IComparer<string>
     {
-        // --- GÜNCELLENDİ: Metod imzası, arayüzün beklediği nullable tiplerle güncellendi ---
         public int Compare(string? x, string? y)
         {
             if (x == null || y == null) return 0;
-
             var regex = new Regex("([0-9]+)");
             var xParts = regex.Split(x);
             var yParts = regex.Split(y);
-
             int partCount = Math.Min(xParts.Length, yParts.Length);
-
             for (int i = 0; i < partCount; i++)
             {
                 if (xParts[i] == yParts[i]) continue;
-
                 bool xIsNumeric = int.TryParse(xParts[i], out int xNum);
                 bool yIsNumeric = int.TryParse(yParts[i], out int yNum);
-
                 if (xIsNumeric && yIsNumeric)
                 {
-                    if (xNum != yNum)
-                        return xNum.CompareTo(yNum);
+                    if (xNum != yNum) return xNum.CompareTo(yNum);
                 }
                 else
                 {
                     int stringCompare = string.Compare(xParts[i], yParts[i], StringComparison.OrdinalIgnoreCase);
-                    if (stringCompare != 0)
-                        return stringCompare;
+                    if (stringCompare != 0) return stringCompare;
                 }
             }
             return x.Length.CompareTo(y.Length);
@@ -103,8 +97,10 @@ namespace BLBM_ENV.Controllers
 
                 foreach (var portModel in unifiedPortList.Where(p => p.IsConnected && !p.IsVirtual))
                 {
+                    var expectedViaText = $"_{portModel.RemotePort}";
+
                     portModel.PassthroughConnections = relevantVirtualConnections
-                        .Where(vc => vc.SourceDeviceID == portModel.RemoteDevice.ID)
+                        .Where(vc => vc.SourceDeviceID == portModel.RemoteDevice.ID && (vc.ConnectionType ?? "").Contains(expectedViaText))
                         .ToList();
                 }
             }
@@ -245,6 +241,79 @@ namespace BLBM_ENV.Controllers
             successMessage.Append($"{envanterList.Count} yeni kayıt başarıyla eklendi.");
             TempData["SuccessMessage"] = successMessage.ToString();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> ExportToExcel()
+        {
+            var envanterler = await _context.Envanterler.AsNoTracking().ToListAsync();
+
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Envanter Listesi");
+                var currentRow = 1;
+
+                worksheet.Cell(currentRow, 1).Value = "ID";
+                worksheet.Cell(currentRow, 2).Value = "DeviceName";
+                worksheet.Cell(currentRow, 3).Value = "IpAddress";
+                worksheet.Cell(currentRow, 4).Value = "Model";
+                worksheet.Cell(currentRow, 5).Value = "ServiceTagSerialNumber";
+                worksheet.Cell(currentRow, 6).Value = "VcenterAddress";
+                worksheet.Cell(currentRow, 7).Value = "ClusterName";
+                worksheet.Cell(currentRow, 8).Value = "Location";
+                worksheet.Cell(currentRow, 9).Value = "OperatingSystem";
+                worksheet.Cell(currentRow, 10).Value = "IloIdracIp";
+                worksheet.Cell(currentRow, 11).Value = "Kabin";
+                worksheet.Cell(currentRow, 12).Value = "RearFront";
+                worksheet.Cell(currentRow, 13).Value = "KabinU";
+                worksheet.Cell(currentRow, 14).Value = "Tur";
+                worksheet.Row(1).Style.Font.Bold = true;
+
+                foreach (var envanter in envanterler)
+                {
+                    currentRow++;
+                    worksheet.Cell(currentRow, 1).Value = envanter.ID;
+                    worksheet.Cell(currentRow, 2).Value = envanter.DeviceName;
+                    worksheet.Cell(currentRow, 3).Value = envanter.IpAddress;
+                    worksheet.Cell(currentRow, 4).Value = envanter.Model;
+                    worksheet.Cell(currentRow, 5).Value = envanter.ServiceTagSerialNumber;
+                    worksheet.Cell(currentRow, 6).Value = envanter.VcenterAddress;
+                    worksheet.Cell(currentRow, 7).Value = envanter.ClusterName;
+                    worksheet.Cell(currentRow, 8).Value = envanter.Location;
+                    worksheet.Cell(currentRow, 9).Value = envanter.OperatingSystem;
+                    worksheet.Cell(currentRow, 10).Value = envanter.IloIdracIp;
+                    worksheet.Cell(currentRow, 11).Value = envanter.Kabin;
+                    worksheet.Cell(currentRow, 12).Value = envanter.RearFront;
+                    worksheet.Cell(currentRow, 13).Value = envanter.KabinU;
+                    worksheet.Cell(currentRow, 14).Value = envanter.Tur;
+                }
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+                    var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    var fileName = $"EnvanterListesi_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                    return File(content, contentType, fileName);
+                }
+            }
+        }
+
+        public async Task<IActionResult> ExportToCsv()
+        {
+            var envanterler = await _context.Envanterler.AsNoTracking().ToListAsync();
+
+            using (var memoryStream = new MemoryStream())
+            using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
+            using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
+            {
+                csvWriter.WriteRecords(envanterler);
+                streamWriter.Flush();
+
+                var content = memoryStream.ToArray();
+                var contentType = "text/csv";
+                var fileName = $"EnvanterListesi_{DateTime.Now:yyyyMMddHHmmss}.csv";
+                return File(content, contentType, fileName);
+            }
         }
 
         private bool EnvanterExists(int id)
