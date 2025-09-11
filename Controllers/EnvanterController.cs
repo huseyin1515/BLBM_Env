@@ -62,32 +62,70 @@ namespace BLBM_ENV.Controllers
             ViewBag.AllDevicesForSelectList = await _context.Envanterler.Where(e => e.ID != id).OrderBy(e => e.DeviceName).ToListAsync();
             ViewBag.AllConnections = await _context.Baglantilar.Select(b => new { SourceDeviceName = b.SourceDevice.DeviceName, SourcePort = b.Source_Port, TargetDeviceName = b.TargetDevice.DeviceName, TargetPort = b.Target_Port }).ToListAsync();
 
-            var allConnectionsForDevice = await _context.Baglantilar
+            var unifiedPortList = new List<UnifiedPortViewModel>();
+            var processedConnections = new HashSet<Tuple<int, int>>();
+
+            var sourceConnections = await _context.Baglantilar
                 .Include(b => b.SourceDevice)
                 .Include(b => b.TargetDevice)
-                .Where(b => b.SourceDeviceID == id || b.TargetDeviceID == id)
+                .Where(b => b.SourceDeviceID == id)
                 .ToListAsync();
 
-            var unifiedPortList = allConnectionsForDevice.Select(c =>
+            foreach (var c in sourceConnections)
             {
-                var isSource = c.SourceDeviceID == id;
-                return new UnifiedPortViewModel
+                unifiedPortList.Add(new UnifiedPortViewModel
                 {
-                    Port = isSource ? c.Source_Port : c.Target_Port,
+                    Port = c.Source_Port,
                     ConnectionID = c.ID,
                     Type = c.ConnectionType,
-                    LinkStatus = isSource ? c.Source_LinkStatus : c.Target_LinkStatus,
-                    LinkSpeed = isSource ? c.Source_LinkSpeed : c.Target_LinkSpeed,
-                    MacAddress = isSource ? (c.Source_BakirMAC ?? c.Source_FiberMAC) : (c.Target_BakirMAC ?? c.Target_FiberMAC),
-                    WWPN = isSource ? c.Source_WWPN : c.Target_WWPN,
+                    LinkStatus = c.Source_LinkStatus,
+                    LinkSpeed = c.Source_LinkSpeed,
+                    BakirMAC = c.Source_BakirMAC,
+                    FiberMAC = c.Source_FiberMAC,
+                    WWPN = c.Source_WWPN,
                     IsConnected = c.TargetDeviceID != null,
-                    RemoteDevice = isSource ? c.TargetDevice : c.SourceDevice,
-                    RemotePort = isSource ? c.Target_Port : c.Source_Port,
+                    RemoteDevice = c.TargetDevice,
+                    RemotePort = c.Target_Port,
                     IsVirtual = (c.ConnectionType ?? "").StartsWith("Virtual")
-                };
-            }).ToList();
+                });
+                if (c.TargetDeviceID.HasValue)
+                {
+                    processedConnections.Add(new Tuple<int, int>(Math.Min(c.SourceDeviceID.Value, c.TargetDeviceID.Value), Math.Max(c.SourceDeviceID.Value, c.TargetDeviceID.Value)));
+                }
+            }
 
-            var remoteDeviceIds = unifiedPortList.Where(p => p.IsConnected && !p.IsVirtual).Select(p => p.RemoteDevice.ID).Distinct();
+            var targetConnections = await _context.Baglantilar
+                .Include(b => b.SourceDevice)
+                .Include(b => b.TargetDevice)
+                .Where(b => b.TargetDeviceID == id)
+                .ToListAsync();
+
+            foreach (var c in targetConnections)
+            {
+                if (c.SourceDeviceID.HasValue)
+                {
+                    var connectionTuple = new Tuple<int, int>(Math.Min(c.SourceDeviceID.Value, c.TargetDeviceID.Value), Math.Max(c.SourceDeviceID.Value, c.TargetDeviceID.Value));
+                    if (processedConnections.Contains(connectionTuple)) continue;
+                }
+
+                unifiedPortList.Add(new UnifiedPortViewModel
+                {
+                    Port = c.Target_Port,
+                    ConnectionID = c.ID,
+                    Type = c.ConnectionType,
+                    LinkStatus = c.Target_LinkStatus,
+                    LinkSpeed = c.Target_LinkSpeed,
+                    BakirMAC = c.Target_BakirMAC,
+                    FiberMAC = c.Target_FiberMAC,
+                    WWPN = c.Target_WWPN,
+                    IsConnected = true,
+                    RemoteDevice = c.SourceDevice,
+                    RemotePort = c.Source_Port,
+                    IsVirtual = (c.ConnectionType ?? "").StartsWith("Virtual")
+                });
+            }
+
+            var remoteDeviceIds = unifiedPortList.Where(p => p.IsConnected && !p.IsVirtual && p.RemoteDevice != null).Select(p => p.RemoteDevice.ID).Distinct();
             if (remoteDeviceIds.Any())
             {
                 var relevantVirtualConnections = await _context.Baglantilar
@@ -95,10 +133,9 @@ namespace BLBM_ENV.Controllers
                     .Where(b => b.ConnectionType.StartsWith("Virtual") && b.SourceDeviceID.HasValue && remoteDeviceIds.Contains(b.SourceDeviceID.Value))
                     .ToListAsync();
 
-                foreach (var portModel in unifiedPortList.Where(p => p.IsConnected && !p.IsVirtual))
+                foreach (var portModel in unifiedPortList.Where(p => p.IsConnected && !p.IsVirtual && p.RemoteDevice != null))
                 {
                     var expectedViaText = $"_{portModel.RemotePort}";
-
                     portModel.PassthroughConnections = relevantVirtualConnections
                         .Where(vc => vc.SourceDeviceID == portModel.RemoteDevice.ID && (vc.ConnectionType ?? "").Contains(expectedViaText))
                         .ToList();

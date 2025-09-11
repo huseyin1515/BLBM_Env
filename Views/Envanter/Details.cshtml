@@ -70,7 +70,8 @@
                             <th>Tür</th>
                             <th>Link Durumu</th>
                             <th>Link Hızı</th>
-                            <th>MAC Adresi</th>
+                            <th>Bakır MAC</th>
+                            <th>Fiber MAC</th>
                             <th>WWPN</th>
                             <th>Karşı Cihaz</th>
                             <th>Karşı Port</th>
@@ -81,7 +82,7 @@
                         @if (!sortedUnifiedPortList.Any())
                         {
                             <tr>
-                                <td colspan="9" class="text-center p-3 text-muted">Bu cihaza ait kayıtlı bağlantı veya port detayı bulunmamaktadır.</td>
+                                <td colspan="10" class="text-center p-3 text-muted">Bu cihaza ait kayıtlı bağlantı veya port detayı bulunmamaktadır.</td>
                             </tr>
                         }
                         else
@@ -93,7 +94,8 @@
                                     <td>@item.Type</td>
                                     <td>@item.LinkStatus</td>
                                     <td>@item.LinkSpeed</td>
-                                    <td><code>@item.MacAddress</code></td>
+                                    <td><code>@item.BakirMAC</code></td>
+                                    <td><code>@item.FiberMAC</code></td>
                                     <td><code>@item.WWPN</code></td>
                                     @if (item.IsConnected)
                                     {
@@ -133,10 +135,18 @@
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="SourceDeviceID" value="@Model.ID" />
                 <div class="form-row-wrapper">
-                    <div class="mb-3"><label class="form-label fw-bold">1. Kaynak Port</label><input type="text" id="kaynakPortInput" name="Source_Port" class="form-control" required /></div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">1. Kaynak Port</label>
+                        <input type="text" id="kaynakPortInput" name="Source_Port" class="form-control" required />
+                        <div id="kaynakPortWarning" class="alert alert-warning p-2 mt-2" style="display: none;"></div>
+                    </div>
                     <div class="mb-3 form-step" id="targetTypeContainer"><label class="form-label fw-bold">2. Hedef Cihaz Türü</label><select id="targetDeviceTypeFilter" class="form-select"><option value="">-- Tüm Türler --</option><option value="NW Switch">NW Switch</option><option value="SAN Switch">SAN Switch</option><option value="Server">Server</option><option value="Storage">Storage</option></select></div>
                     <div class="mb-3 form-step" id="targetDeviceContainer"><label class="form-label fw-bold">3. Hedef Cihaz</label><select id="targetDeviceSelect" name="TargetDeviceID" class="form-select" required></select></div>
-                    <div class="mb-3 form-step" id="hedefPortContainer"><label class="form-label fw-bold">4. Hedef Port</label><input type="text" id="hedefPortInput" name="Target_Port" class="form-control" required /></div>
+                    <div class="mb-3 form-step" id="hedefPortContainer">
+                        <label class="form-label fw-bold">4. Hedef Port</label>
+                        <input type="text" id="hedefPortInput" name="Target_Port" class="form-control" required />
+                        <div id="hedefPortWarning" class="alert alert-warning p-2 mt-2" style="display: none;"></div>
+                    </div>
                     <div class="mb-3 form-step" id="connectionTypeContainer">
                         <label class="form-label fw-bold">5. Bağlantı Türü</label>
                         <select name="ConnectionType" id="connectionTypeSelect" class="form-select">
@@ -165,20 +175,14 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // --- YENİ VE GARANTİLİ JAVASCRIPT KODU ---
-
-            // 1. Adım: Tablonun var olup olmadığını kontrol et
             if ($('#portDetailsTable').length > 0 && @sortedUnifiedPortList.Count > 0) {
-
                 var portTable = $('#portDetailsTable').DataTable({
                     ordering: false,
                     paging: false,
                     info: false,
-                    dom: 'rt', // Sadece tabloyu render et, arama kutusu vs. olmasın
+                    dom: 'rt',
                     language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json' },
-                    columnDefs: [
-                        { "targets": '.no-filter', "searchable": false }
-                    ],
+                    columnDefs: [ { "targets": '.no-filter', "searchable": false } ],
                     initComplete: function () {
                         this.api().columns().every(function () {
                             var column = this;
@@ -226,8 +230,7 @@
                 });
             }
 
-            // Dinamik Form için scriptler (Aynı kalıyor)
-            #region Dinamik Form Script
+            const allConnections = @Html.Raw(allConnectionsJson);
             const allDeviceOptions = @Html.Raw(JsonSerializer.Serialize(((List<Envanter>)ViewBag.AllDevicesForSelectList).Select(d => new { id = d.ID, name = d.DeviceName, tur = d.Tur })));
             const sourceDeviceType = '@Model.Tur';
             const formElements = {
@@ -309,7 +312,32 @@
                 formElements.targetDevice.val('');
                 updateFormState();
             });
-            #endregion
+            function checkPortUsage(portInput, deviceName, warningDiv) {
+                const enteredPort = portInput.val().trim();
+                if (!enteredPort || !deviceName) {
+                    warningDiv.slideUp();
+                    return;
+                }
+                const connectionInUse = allConnections.find(conn =>
+                    (conn.SourceDeviceName === deviceName && conn.SourcePort && conn.SourcePort.toLowerCase() === enteredPort.toLowerCase()) ||
+                    (conn.TargetDeviceName === deviceName && conn.TargetPort && conn.TargetPort.toLowerCase() === enteredPort.toLowerCase())
+                );
+                if (connectionInUse) {
+                    const otherDevice = connectionInUse.SourceDeviceName === deviceName ? connectionInUse.TargetDeviceName : connectionInUse.SourceDeviceName;
+                    warningDiv.html(`<strong>Uyarı:</strong> Bu port zaten <strong>${otherDevice}</strong> cihazına bağlı.`).slideDown();
+                } else {
+                    warningDiv.slideUp();
+                }
+            }
+            formElements.kaynakPort.on('input', function() {
+                checkPortUsage($(this), '@Model.DeviceName', $('#kaynakPortWarning'));
+            });
+            function checkTargetPort() {
+                const targetDeviceName = formElements.targetDevice.find('option:selected').text();
+                checkPortUsage(formElements.hedefPort, targetDeviceName, $('#hedefPortWarning'));
+            }
+            formElements.hedefPort.on('input', checkTargetPort);
+            formElements.targetDevice.on('change', checkTargetPort);
         });
     </script>
 }

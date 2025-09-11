@@ -1,23 +1,25 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\",
+  "WorkspaceRootPath": "C:\\Users\\husey\\source\\repos\\BLBM_Env1\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EnvanterDB/True/SqlTable/dbo.Baglantilar.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EnvanterDB/True/SqlTable/dbo.Vips.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\asus\\source\\repos\\blbm_env\\controllers\\vipcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:controllers\\vipcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\asus\\source\\repos\\blbm_env\\views\\envanter\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env1\\views\\envanter\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:views\\envanter\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\asus\\source\\repos\\blbm_env\\views\\baglanti\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env1\\controllers\\vipcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:controllers\\vipcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env1\\controllers\\envantercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:controllers\\envantercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env1\\models\\unifiedportviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:models\\unifiedportviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env1\\views\\baglanti\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:views\\baglanti\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
@@ -28,7 +30,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -36,46 +38,60 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "dbo.Baglantilar [Data]",
-              "DocumentMoniker": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EnvanterDB/True/SqlTable/dbo.Baglantilar.sql",
-              "ToolTip": "dbo.Baglantilar [Data]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-09-09T12:32:40.334Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "dbo.Vips [Data]",
-              "DocumentMoniker": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EnvanterDB/True/SqlTable/dbo.Vips.sql",
-              "ToolTip": "dbo.Vips [Data]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-09-09T12:32:17.362Z",
+              "DocumentIndex": 3,
+              "Title": "UnifiedPortViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env1\\Models\\UnifiedPortViewModel.cs",
+              "RelativeDocumentMoniker": "Models\\UnifiedPortViewModel.cs",
+              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env1\\Models\\UnifiedPortViewModel.cs",
+              "RelativeToolTip": "Models\\UnifiedPortViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-11T10:38:44.776Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "EnvanterController.cs",
+              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env1\\Controllers\\EnvanterController.cs",
+              "RelativeDocumentMoniker": "Controllers\\EnvanterController.cs",
+              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env1\\Controllers\\EnvanterController.cs",
+              "RelativeToolTip": "Controllers\\EnvanterController.cs",
+              "ViewState": "AgIAADYBAAAAAAAAAAAYwGgBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-11T10:01:19.328Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "VipController.cs",
-              "DocumentMoniker": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Controllers\\VipController.cs",
+              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env1\\Controllers\\VipController.cs",
               "RelativeDocumentMoniker": "Controllers\\VipController.cs",
-              "ToolTip": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Controllers\\VipController.cs",
+              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env1\\Controllers\\VipController.cs",
               "RelativeToolTip": "Controllers\\VipController.cs",
-              "ViewState": "AgIAAGsAAAAAAAAAAAAAAA0BAAABAAAAAAAAAA==",
+              "ViewState": "AgIAANwAAAAAAAAAAAAAAA0BAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-09T11:41:01.091Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "Details.cshtml",
-              "DocumentMoniker": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Views\\Envanter\\Details.cshtml",
+              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env1\\Views\\Envanter\\Details.cshtml",
               "RelativeDocumentMoniker": "Views\\Envanter\\Details.cshtml",
-              "ToolTip": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Views\\Envanter\\Details.cshtml",
+              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env1\\Views\\Envanter\\Details.cshtml",
               "RelativeToolTip": "Views\\Envanter\\Details.cshtml",
-              "ViewState": "AgIAADoBAAAAAAAAAAAAADsBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAEoBAAAAAAAAAAAAAFYBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-09-09T11:25:24.358Z",
               "EditorCaption": ""
@@ -84,14 +100,13 @@
               "$type": "Document",
               "DocumentIndex": 4,
               "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Views\\Baglanti\\Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env1\\Views\\Baglanti\\Index.cshtml",
               "RelativeDocumentMoniker": "Views\\Baglanti\\Index.cshtml",
-              "ToolTip": "C:\\Users\\ASUS\\source\\repos\\BLBM_Env\\Views\\Baglanti\\Index.cshtml",
+              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env1\\Views\\Baglanti\\Index.cshtml",
               "RelativeToolTip": "Views\\Baglanti\\Index.cshtml",
               "ViewState": "AgIAAPIAAAAAAAAAAADwvyMBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-09T11:12:46.309Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-09T11:12:46.309Z"
             }
           ]
         }

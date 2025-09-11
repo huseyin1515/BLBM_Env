@@ -262,6 +262,9 @@ namespace BLBM_ENV.Controllers
             }
             else { newConnection.Target_Port = string.Empty; }
 
+            newConnection.Target_LinkStatus = newConnection.Source_LinkStatus;
+            newConnection.Target_LinkSpeed = newConnection.Source_LinkSpeed;
+
             connectionsToAdd.Add(newConnection);
         }
 
@@ -315,6 +318,10 @@ namespace BLBM_ENV.Controllers
                                 var finalDeviceId = physicalConnection.SourceDeviceID == intermediateDevice.ID ? physicalConnection.TargetDeviceID : physicalConnection.SourceDeviceID;
                                 var finalPort = physicalConnection.SourceDeviceID == intermediateDevice.ID ? physicalConnection.Target_Port : physicalConnection.Source_Port;
                                 var newVirtualConnection = new Baglanti { SourceDeviceID = sourceDevice.ID, TargetDeviceID = finalDeviceId, Source_Port = sourcePort, Target_Port = finalPort, ConnectionType = $"{connectionType} (via {pathRef})", Source_LinkStatus = row.Cell("G").Value.ToString().Trim(), Source_LinkSpeed = row.Cell("H").Value.ToString().Trim(), Source_NicID = row.Cell("J").Value.ToString().Trim(), Source_FiberMAC = row.Cell("K").Value.ToString().Trim(), Source_BakirMAC = row.Cell("L").Value.ToString().Trim(), Source_WWPN = row.Cell("M").Value.ToString() };
+
+                                newVirtualConnection.Target_LinkStatus = newVirtualConnection.Source_LinkStatus;
+                                newVirtualConnection.Target_LinkSpeed = newVirtualConnection.Source_LinkSpeed;
+
                                 bool alreadyExists = connectionsToAdd.Any(c => c.SourceDeviceID == newVirtualConnection.SourceDeviceID && c.Source_Port == newVirtualConnection.Source_Port && c.TargetDeviceID == newVirtualConnection.TargetDeviceID && c.Target_Port == newVirtualConnection.Target_Port);
                                 if (!alreadyExists) { connectionsToAdd.Add(newVirtualConnection); }
                             }
@@ -333,7 +340,7 @@ namespace BLBM_ENV.Controllers
                 var totalErrorCount = errorList.Count;
                 var errorMessages = errorList.Take(maxErrorsToShow).ToList();
                 if (totalErrorCount > maxErrorsToShow) { errorMessages.Add($"<br><b>... ve toplam {totalErrorCount - maxErrorsToShow} diğer hata daha bulundu.</b>"); }
-                TempData["ErrorMessage"] = string.Join("<br>", errorMessages);
+                TempData["ErrorMessage"] = string.Join("<br>", errorList);
             }
             return RedirectToAction(nameof(Index));
         }
