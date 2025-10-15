@@ -17,89 +17,89 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = BLBM_Env
 build_property.RootNamespace = BLBM_Env
-build_property.ProjectDir = C:\Users\husey\source\repos\BLBM_Env1\
+build_property.ProjectDir = C:\Users\ASUS\source\repos\BLBM_Env\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\husey\source\repos\BLBM_Env1
+build_property.MSBuildProjectDirectory = C:\Users\ASUS\source\repos\BLBM_Env
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Baglanti/Delete.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Baglanti/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFnbGFudGlcRGVsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Baglanti/Details.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Baglanti/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFnbGFudGlcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Baglanti/Edit.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Baglanti/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFnbGFudGlcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Baglanti/Index.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Baglanti/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFnbGFudGlcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Envanter/Create.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Envanter/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW52YW50ZXJcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Envanter/Delete.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Envanter/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW52YW50ZXJcRGVsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Envanter/Details.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Envanter/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW52YW50ZXJcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Envanter/Edit.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Envanter/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW52YW50ZXJcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Envanter/Index.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Envanter/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW52YW50ZXJcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Home/Index.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Home/Privacy.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Kabin/Index.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Kabin/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2FiaW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Kabin/RackView.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Kabin/RackView.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2FiaW5cUmFja1ZpZXcuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Shared/Error.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Vip/Index.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Vip/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVmlwXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/_ViewImports.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/_ViewStart.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/husey/source/repos/BLBM_Env1/Views/Shared/_Layout.cshtml]
+[C:/Users/ASUS/source/repos/BLBM_Env/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-9y1v5c8poc
