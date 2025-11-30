@@ -1,0 +1,42 @@
+﻿@model BLBM_ENV.Models.UserRolesViewModel
+
+@{
+    ViewData["Title"] = "Rolleri Yönet";
+}
+
+<div class="page-header">
+    <h1 class="page-title">@ViewData["Title"]</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                Kullanıcı: <strong>@Model.UserName</strong>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" asp-for="UserId" />
+                    <input type="hidden" asp-for="UserName" />
+
+                    @for (int i = 0; i < Model.Roles.Count; i++)
+                    {
+                        <div class="form-check m-1">
+                            <input type="hidden" asp-for="@Model.Roles[i].RoleName" />
+                            <input asp-for="@Model.Roles[i].IsSelected" class="form-check-input" />
+                            <label class="form-check-label" for="@($"Roles_{i}__IsSelected")">
+                                @Model.Roles[i].RoleName
+                            </label>
+                        </div>
+                    }
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <hr />
+                    <div class="form-group">
+                        <input type="submit" value="Değişiklikleri Kaydet" class="btn btn-success" />
+                        <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,10 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Models",
-    "\\wwwroot",
-    "\\wwwroot\\css"
+    "\\Controllers"
   ],
-  "SelectedNode": "\\wwwroot\\css\\site.css",
+  "SelectedNode": "\\Controllers\\VipController.cs",
   "PreviewInSolutionExplorer": false
 }

@@ -1,10 +1,17 @@
 ﻿@using System.Text.Json
 @using BLBM_ENV.Models
 
+@model BLBM_ENV.Models.Envanter
+
 @{
     ViewData["Title"] = "Detaylar: " + Model.DeviceName;
     var allConnectionsJson = JsonSerializer.Serialize(ViewBag.AllConnections);
     var sortedUnifiedPortList = ViewBag.UnifiedPortList as List<UnifiedPortViewModel> ?? new List<UnifiedPortViewModel>();
+
+    // --- DÜZELTME: Sütun Sayısı Hesabı ---
+    // Admin ise 10 sütun (İşlemler dahil), değilse 9 sütun.
+    bool isAdmin = User.IsInRole("Admin");
+    int totalColumns = isAdmin ? 10 : 9;
 }
 
 <style>
@@ -31,7 +38,10 @@
             <p class="text-muted mb-0">Cihaz Detayları ve Bağlantı Yönetimi</p>
         </div>
         <div>
-            <a asp-action="Edit" asp-route-id="@Model.ID" class="btn btn-outline-warning"><i class="fas fa-pencil-alt me-1"></i> Cihazı Düzenle</a>
+            @if (isAdmin)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.ID" class="btn btn-outline-warning"><i class="fas fa-pencil-alt me-1"></i> Cihazı Düzenle</a>
+            }
             <a asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Listeye Geri Dön</a>
         </div>
     </div>
@@ -75,14 +85,18 @@
                             <th>WWPN</th>
                             <th>Karşı Cihaz</th>
                             <th>Karşı Port</th>
-                            <th class="text-center no-filter">İşlemler</th>
+                            @if (isAdmin)
+                            {
+                                <th class="text-center no-filter">İşlemler</th>
+                            }
                         </tr>
                     </thead>
                     <tbody id="port-list-body">
                         @if (!sortedUnifiedPortList.Any())
                         {
                             <tr>
-                                <td colspan="10" class="text-center p-3 text-muted">Bu cihaza ait kayıtlı bağlantı veya port detayı bulunmamaktadır.</td>
+                                <!-- DÜZELTME: Colspan sayısını dinamik yapıyoruz -->
+                                <td colspan="@totalColumns" class="text-center p-3 text-muted">Bu cihaza ait kayıtlı bağlantı veya port detayı bulunmamaktadır.</td>
                             </tr>
                         }
                         else
@@ -113,12 +127,16 @@
                                     {
                                         <td colspan="2" class="text-center fst-italic text-muted">Boşta / Bağlantı Yok</td>
                                     }
-                                    <td class="text-center">
-                                        <div class="btn-group btn-group-sm">
-                                            <a asp-controller="Baglanti" asp-action="Edit" asp-route-id="@item.ConnectionID" class="btn btn-outline-warning" title="Port Detayını Düzenle"><i class="fas fa-pencil-alt"></i></a>
-                                            <a asp-controller="Baglanti" asp-action="Delete" asp-route-id="@item.ConnectionID" class="btn btn-outline-danger" title="Bağlantıyı/Portu Sil"><i class="fas fa-trash-alt"></i></a>
-                                        </div>
-                                    </td>
+
+                                    @if (isAdmin)
+                                    {
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm">
+                                                <a asp-controller="Baglanti" asp-action="Edit" asp-route-id="@item.ConnectionID" class="btn btn-outline-warning" title="Port Detayını Düzenle"><i class="fas fa-pencil-alt"></i></a>
+                                                <a asp-controller="Baglanti" asp-action="Delete" asp-route-id="@item.ConnectionID" class="btn btn-outline-danger" title="Bağlantıyı/Portu Sil"><i class="fas fa-trash-alt"></i></a>
+                                            </div>
+                                        </td>
+                                    }
                                 </tr>
                             }
                         }
@@ -128,54 +146,58 @@
         </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-light"><h5 class="mb-0"><i class="fas fa-plus-circle me-2 text-info"></i>Yeni Bağlantı Oluştur</h5></div>
-        <div class="card-body">
-            <form asp-controller="Baglanti" asp-action="Create" method="post">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="SourceDeviceID" value="@Model.ID" />
-                <div class="form-row-wrapper">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">1. Kaynak Port</label>
-                        <input type="text" id="kaynakPortInput" name="Source_Port" class="form-control" required />
-                        <div id="kaynakPortWarning" class="alert alert-warning p-2 mt-2" style="display: none;"></div>
+    @if (isAdmin)
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-light"><h5 class="mb-0"><i class="fas fa-plus-circle me-2 text-info"></i>Yeni Bağlantı Oluştur</h5></div>
+            <div class="card-body">
+                <form asp-controller="Baglanti" asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="SourceDeviceID" value="@Model.ID" />
+                    <div class="form-row-wrapper">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">1. Kaynak Port</label>
+                            <input type="text" id="kaynakPortInput" name="Source_Port" class="form-control" required />
+                            <div id="kaynakPortWarning" class="alert alert-warning p-2 mt-2" style="display: none;"></div>
+                        </div>
+                        <div class="mb-3 form-step" id="targetTypeContainer"><label class="form-label fw-bold">2. Hedef Cihaz Türü</label><select id="targetDeviceTypeFilter" class="form-select"><option value="">-- Tüm Türler --</option><option value="NW Switch">NW Switch</option><option value="SAN Switch">SAN Switch</option><option value="Server">Server</option><option value="Storage">Storage</option></select></div>
+                        <div class="mb-3 form-step" id="targetDeviceContainer"><label class="form-label fw-bold">3. Hedef Cihaz</label><select id="targetDeviceSelect" name="TargetDeviceID" class="form-select" required></select></div>
+                        <div class="mb-3 form-step" id="hedefPortContainer">
+                            <label class="form-label fw-bold">4. Hedef Port</label>
+                            <input type="text" id="hedefPortInput" name="Target_Port" class="form-control" required />
+                            <div id="hedefPortWarning" class="alert alert-warning p-2 mt-2" style="display: none;"></div>
+                        </div>
+                        <div class="mb-3 form-step" id="connectionTypeContainer">
+                            <label class="form-label fw-bold">5. Bağlantı Türü</label>
+                            <select name="ConnectionType" id="connectionTypeSelect" class="form-select">
+                                <option value="">-- Tür Seçin --</option>
+                                <option value="FC">FC</option>
+                                <option value="Bakır">Bakır</option>
+                                <option value="Virtual FC">Virtual FC</option>
+                                <option value="Virtual Bakır">Virtual Bakır</option>
+                            </select>
+                        </div>
+                        <div class="conditional-field" id="sourceDetailWrapper"><label class="form-label fw-bold" id="sourceDetailLabel"></label><input type="text" id="sourceDetailInput" class="form-control" /></div>
+                        <div class="conditional-field" id="targetDetailWrapper"><label class="form-label fw-bold" id="targetDetailLabel"></label><input type="text" id="targetDetailInput" class="form-control" /></div>
+                        <div class="mb-3 form-step" id="linkDetailsContainer">
+                            <label class="form-label fw-bold">Link Durumu</label><select name="Source_LinkStatus" class="form-select mb-2"><option value="Up">Up</option><option value="Down">Down</option></select>
+                            <label class="form-label fw-bold">Link Hızı</label><input type="text" name="Source_LinkSpeed" class="form-control" />
+                        </div>
                     </div>
-                    <div class="mb-3 form-step" id="targetTypeContainer"><label class="form-label fw-bold">2. Hedef Cihaz Türü</label><select id="targetDeviceTypeFilter" class="form-select"><option value="">-- Tüm Türler --</option><option value="NW Switch">NW Switch</option><option value="SAN Switch">SAN Switch</option><option value="Server">Server</option><option value="Storage">Storage</option></select></div>
-                    <div class="mb-3 form-step" id="targetDeviceContainer"><label class="form-label fw-bold">3. Hedef Cihaz</label><select id="targetDeviceSelect" name="TargetDeviceID" class="form-select" required></select></div>
-                    <div class="mb-3 form-step" id="hedefPortContainer">
-                        <label class="form-label fw-bold">4. Hedef Port</label>
-                        <input type="text" id="hedefPortInput" name="Target_Port" class="form-control" required />
-                        <div id="hedefPortWarning" class="alert alert-warning p-2 mt-2" style="display: none;"></div>
+                    <div class="form-group mt-3 text-end">
+                        <button type="submit" class="btn btn-success form-step" id="createConnectionBtn"><i class="fas fa-plus me-1"></i> Bağlantıyı Oluştur</button>
                     </div>
-                    <div class="mb-3 form-step" id="connectionTypeContainer">
-                        <label class="form-label fw-bold">5. Bağlantı Türü</label>
-                        <select name="ConnectionType" id="connectionTypeSelect" class="form-select">
-                            <option value="">-- Tür Seçin --</option>
-                            <option value="FC">FC</option>
-                            <option value="Bakır">Bakır</option>
-                            <option value="Virtual FC">Virtual FC</option>
-                            <option value="Virtual Bakır">Virtual Bakır</option>
-                        </select>
-                    </div>
-                    <div class="conditional-field" id="sourceDetailWrapper"><label class="form-label fw-bold" id="sourceDetailLabel"></label><input type="text" id="sourceDetailInput" class="form-control" /></div>
-                    <div class="conditional-field" id="targetDetailWrapper"><label class="form-label fw-bold" id="targetDetailLabel"></label><input type="text" id="targetDetailInput" class="form-control" /></div>
-                    <div class="mb-3 form-step" id="linkDetailsContainer">
-                        <label class="form-label fw-bold">Link Durumu</label><select name="Source_LinkStatus" class="form-select mb-2"><option value="Up">Up</option><option value="Down">Down</option></select>
-                        <label class="form-label fw-bold">Link Hızı</label><input type="text" name="Source_LinkSpeed" class="form-control" />
-                    </div>
-                </div>
-                <div class="form-group mt-3 text-end">
-                    <button type="submit" class="btn btn-success form-step" id="createConnectionBtn"><i class="fas fa-plus me-1"></i> Bağlantıyı Oluştur</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-    </div>
+    }
 </div>
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            if ($('#portDetailsTable').length > 0 && @sortedUnifiedPortList.Count > 0) {
+            // DataTables sadece satır varsa çalışsın
+            if ($('#portDetailsTable tbody tr').length > 0 && @(sortedUnifiedPortList.Any() ? "true" : "false")) {
                 var portTable = $('#portDetailsTable').DataTable({
                     ordering: false,
                     paging: false,

@@ -6,14 +6,13 @@
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
 <style>
-    /* --- GÜNCELLENDİ: Tıklanabilir satırlar için hover efekti --- */
     #envanterTablosu tbody tr {
         cursor: pointer;
-        transition: background-color 0.2s ease-in-out; /* Yumuşak geçiş animasyonu */
+        transition: background-color 0.2s ease-in-out;
     }
 
         #envanterTablosu tbody tr:hover {
-            background-color: #e9ecef !important; /* Bootstrap'in açık gri rengi. !important, zebra stilini ezmek için gerekli. */
+            background-color: #e9ecef !important;
         }
 </style>
 
@@ -29,12 +28,16 @@
                 <li><a class="dropdown-item" asp-action="ExportToCsv"><i class="fas fa-file-csv me-2 text-secondary"></i>CSV Olarak Aktar (.csv)</a></li>
             </ul>
         </div>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#excelImportModal">
-            <i class="fas fa-file-excel me-1"></i> Envanter Yükle
-        </button>
-        <a asp-controller="Envanter" asp-action="Create" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i> Yeni Cihaz Ekle
-        </a>
+        <!-- YENİ EKLENDİ: Sadece Admin görebilir -->
+        @if (User.IsInRole("Admin"))
+        {
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#excelImportModal">
+                <i class="fas fa-file-excel me-1"></i> Envanter Yükle
+            </button>
+            <a asp-controller="Envanter" asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Yeni Cihaz Ekle
+            </a>
+        }
     </div>
 </div>
 
@@ -71,7 +74,11 @@
                         <th>Ön/Arka</th>
                         <th>U Değeri</th>
                         <th class="text-center no-filter">Bağlantılar</th>
-                        <th class="text-center no-sort no-filter">İşlemler</th>
+                        <!-- YENİ EKLENDİ: Sadece Admin görebilir -->
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <th class="text-center no-sort no-filter">İşlemler</th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -96,13 +103,17 @@
                                 <td class="text-center">
                                     <span class="badge bg-dark rounded-pill">@(item.AsSourceConnections.Count() + item.AsTargetConnections.Count())</span>
                                 </td>
-                                <td class="text-center">
-                                    <div class="btn-group btn-group-sm">
-                                        <a asp-controller="Envanter" asp-action="Details" asp-route-id="@item.ID" class="btn btn-outline-info" title="Detayları Görüntüle"><i class="fas fa-eye"></i></a>
-                                        <a asp-controller="Envanter" asp-action="Edit" asp-route-id="@item.ID" class="btn btn-outline-warning" title="Düzenle"><i class="fas fa-pencil-alt"></i></a>
-                                        <a asp-controller="Envanter" asp-action="Delete" asp-route-id="@item.ID" class="btn btn-outline-danger" title="Sil"><i class="fas fa-trash-alt"></i></a>
-                                    </div>
-                                </td>
+                                <!-- YENİ EKLENDİ: Sadece Admin görebilir -->
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-controller="Envanter" asp-action="Details" asp-route-id="@item.ID" class="btn btn-outline-info" title="Detayları Görüntüle"><i class="fas fa-eye"></i></a>
+                                            <a asp-controller="Envanter" asp-action="Edit" asp-route-id="@item.ID" class="btn btn-outline-warning" title="Düzenle"><i class="fas fa-pencil-alt"></i></a>
+                                            <a asp-controller="Envanter" asp-action="Delete" asp-route-id="@item.ID" class="btn btn-outline-danger" title="Sil"><i class="fas fa-trash-alt"></i></a>
+                                        </div>
+                                    </td>
+                                }
                             </tr>
                         }
                     }
@@ -112,23 +123,30 @@
     </div>
 </div>
 
-#region Modallar
+
 <div class="modal fade" id="excelImportModal" tabindex="-1" aria-labelledby="excelImportModalLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><form asp-controller="Envanter" asp-action="ImportFromExcel" method="post" enctype="multipart/form-data"><div class="modal-header"><h5 class="modal-title" id="excelImportModalLabel">Excel'den Envanter Yükle</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><div class="mb-3"><label for="excelFile" class="form-label">Excel veya CSV Dosyası (.xlsx, .csv)</label><input class="form-control" type="file" name="excelFile" id="excelFile" accept=".xlsx,.csv" required></div><hr /><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="deleteAll" value="true" id="deleteAllSwitch"><label class="form-check-label fw-bold" for="deleteAllSwitch">Mevcut Kayıtları Sil ve Yükle</label></div><div class="alert alert-danger mt-2" role="alert"><strong>Dikkat:</strong> Bu seçeneği işaretlerseniz, yükleme yapmadan önce veritabanındaki <strong>tüm envanter ve bağlantı kayıtları kalıcı olarak silinecektir!</strong></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-success"><i class="fas fa-upload me-1"></i> Yükle</button></div></form></div></div></div>
 <div class="modal fade" id="virtualDetailImportModal" tabindex="-1" aria-labelledby="virtualDetailImportModalLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><form asp-controller="Baglanti" asp-action="ImportVirtualPathFromExcel" method="post" enctype="multipart/form-data"><div class="modal-header"><h5 class="modal-title" id="virtualDetailImportModalLabel">Excel ile Sanal Port Detayı Yükle</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><div class="mb-3"><label for="excelFile" class="form-label">Excel Dosyası (.xlsx)</label><input class="form-control" type="file" name="excelFile" id="excelFile" accept=".xlsx" required></div><div class="alert alert-info" role="alert"><strong>Bilgi:</strong> Bu işlem, Excel dosyasındaki `Türü` sütunu "Virtual" ile başlayan satırları okuyarak ilgili cihazlara port detayı olarak ekleyecektir.</div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="submit" class="btn btn-success"><i class="fas fa-upload me-1"></i> Yükle</button></div></form></div></div></div>
-#endregion
 
 @section Scripts {
     <script>
         $(document).ready(function () {
+            var isAdmin = @User.IsInRole("Admin").ToString().ToLower();
+            var columnDefs = [
+                { "targets": 'no-sort', "orderable": false },
+                { "targets": 'no-filter', "searchable": false }
+            ];
+
+            // Eğer kullanıcı admin değilse, İşlemler sütununu gizle
+            if (!isAdmin) {
+                columnDefs.push({ "targets": -1, "visible": false });
+            }
+
             var table = $('#envanterTablosu').DataTable({
                 ordering: false,
                 pageLength: 25,
                 lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"] ],
                 language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json' },
-                columnDefs: [
-                    { "targets": 'no-sort', "orderable": false },
-                    { "targets": 'no-filter', "searchable": false }
-                ],
+                columnDefs: columnDefs,
                 initComplete: function () {
                     this.api().columns().every(function () {
                         var column = this;
@@ -176,10 +194,12 @@
             });
 
             $('#envanterTablosu tbody').on('click', 'tr', function (e) {
-                if ($(e.target).is('a, button, i')) {
-                    return;
+                // Admin olmayan kullanıcılar için düzenle/sil butonları zaten td içinde olmayacak.
+                // Bu yüzden tıklama olayını sadece detay linki için yönlendirebiliriz.
+                if ($(e.target).is('a, button, i') && $(e.target).closest('.btn-group').length > 0) {
+                    return; // Butonlara tıklandıysa satır tıklamasını engelle
                 }
-                var detailsLink = $(this).find('a').first();
+                var detailsLink = $(this).find('a[asp-action="Details"]').first();
                 if (detailsLink.length > 0) {
                     window.location.href = detailsLink.attr('href');
                 }

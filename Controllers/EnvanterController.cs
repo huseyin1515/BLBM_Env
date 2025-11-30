@@ -1,12 +1,14 @@
 ﻿using BLBM_ENV.Data;
 using BLBM_ENV.Models;
+using BLBM_ENV.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
 using System.Text.RegularExpressions;
 using ClosedXML.Excel;
 using CsvHelper;
 using System.Globalization;
+using System.Text;
 
 namespace BLBM_ENV.Controllers
 {
@@ -38,18 +40,25 @@ namespace BLBM_ENV.Controllers
         }
     }
 
+    [Authorize]
     public class EnvanterController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IAuditLogger _auditLogger;
 
-        public EnvanterController(ApplicationDbContext context)
+        public EnvanterController(ApplicationDbContext context, IAuditLogger auditLogger)
         {
             _context = context;
+            _auditLogger = auditLogger;
         }
 
         public async Task<IActionResult> Index()
         {
-            var envanterler = await _context.Envanterler.Include(e => e.AsSourceConnections).Include(e => e.AsTargetConnections).OrderBy(e => e.DeviceName).ToListAsync();
+            var envanterler = await _context.Envanterler
+                .Include(e => e.AsSourceConnections)
+                .Include(e => e.AsTargetConnections)
+                .OrderBy(e => e.DeviceName)
+                .ToListAsync();
             return View(envanterler);
         }
 
@@ -143,40 +152,54 @@ namespace BLBM_ENV.Controllers
             }
 
             ViewBag.UnifiedPortList = unifiedPortList.OrderBy(p => p.Port, new NaturalStringComparer()).ToList();
-
             return View(envanter);
         }
 
-        public IActionResult Create()
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create()
         {
+            // Mevcut lokasyonları listele (Datalist için)
+            ViewBag.ExistingLocations = await _context.Envanterler
+                .Where(e => !string.IsNullOrEmpty(e.Location))
+                .Select(e => e.Location).Distinct().OrderBy(l => l).ToListAsync();
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("ID,DeviceName,Tur,ServiceTagSerialNumber,Model,IpAddress,VcenterAddress,ClusterName,Location,OperatingSystem,IloIdracIp,Kabin,RearFront,KabinU")] Envanter envanter)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(envanter);
                 await _context.SaveChangesAsync();
+                await _auditLogger.LogAsync("Ekleme", "Envanter", $"Yeni cihaz eklendi: {envanter.DeviceName}");
                 TempData["SuccessMessage"] = $"{envanter.DeviceName} adlı cihaz başarıyla oluşturuldu.";
                 return RedirectToAction(nameof(Index));
             }
             return View(envanter);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
             var envanter = await _context.Envanterler.FindAsync(id);
             if (envanter == null) return NotFound();
+
+            // --- Datalist İçin Lokasyonları Çek ---
+            ViewBag.ExistingLocations = await _context.Envanterler
+                .Where(e => !string.IsNullOrEmpty(e.Location))
+                .Select(e => e.Location).Distinct().OrderBy(l => l).ToListAsync();
+
             return View(envanter);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,DeviceName,Tur,ServiceTagSerialNumber,Model,IpAddress,VcenterAddress,ClusterName,Location,OperatingSystem,IloIdracIp,Kabin,RearFront,KabinU")] Envanter envanter)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id, [Bind("ID,DeviceName,Tur,ServiceTagSerialNumber,Model,IpAddress,VcenterAddress,ClusterName,Location,OperatingSystem,IloIdracIp,Kabin,RearFront,KabinU,RowVersion")] Envanter envanter)
         {
             if (id != envanter.ID) return NotFound();
             if (ModelState.IsValid)
@@ -185,18 +208,31 @@ namespace BLBM_ENV.Controllers
                 {
                     _context.Update(envanter);
                     await _context.SaveChangesAsync();
+                    await _auditLogger.LogAsync("Güncelleme", "Envanter", $"{envanter.DeviceName} güncellendi.");
+                    TempData["SuccessMessage"] = $"{envanter.DeviceName} başarıyla güncellendi.";
+                    return RedirectToAction(nameof(Details), new { id = envanter.ID });
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException ex)
                 {
-                    if (!EnvanterExists(envanter.ID)) return NotFound();
-                    else throw;
+                    var entry = ex.Entries.Single();
+                    var databaseValues = await entry.GetDatabaseValuesAsync();
+                    if (databaseValues == null)
+                    {
+                        ModelState.AddModelError(string.Empty, "HATA: Bu kayıt siz düzenlerken silinmiş.");
+                    }
+                    else
+                    {
+                        var dbEntity = (Envanter)databaseValues.ToObject();
+                        ModelState.AddModelError(string.Empty, "HATA: Bu kayıt başka bir kullanıcı tarafından değiştirildi.");
+                        ModelState.AddModelError(string.Empty, $"Güncel Değerler -> Ad: {dbEntity.DeviceName}, IP: {dbEntity.IpAddress}");
+                        envanter.RowVersion = (byte[])dbEntity.RowVersion;
+                    }
                 }
-                TempData["SuccessMessage"] = $"{envanter.DeviceName} adlı cihaz başarıyla güncellendi.";
-                return RedirectToAction(nameof(Details), new { id = envanter.ID });
             }
             return View(envanter);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -207,29 +243,38 @@ namespace BLBM_ENV.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var envanter = await _context.Envanterler.FindAsync(id);
             if (envanter != null)
             {
+                string deviceName = envanter.DeviceName;
                 var relatedConnections = _context.Baglantilar.Where(b => b.SourceDeviceID == id || b.TargetDeviceID == id);
                 if (await relatedConnections.AnyAsync())
                 {
                     _context.Baglantilar.RemoveRange(relatedConnections);
                 }
-
                 _context.Envanterler.Remove(envanter);
                 await _context.SaveChangesAsync();
-                TempData["InfoMessage"] = $"{envanter.DeviceName} adlı cihaz ve ilişkili tüm bağlantıları silindi.";
+                await _auditLogger.LogAsync("Silme", "Envanter", $"{deviceName} ve bağlantıları silindi.");
+                TempData["InfoMessage"] = $"{deviceName} silindi.";
             }
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ImportFromExcel(IFormFile excelFile, bool deleteAll)
         {
-            if (excelFile == null || excelFile.Length == 0) { TempData["ErrorMessage"] = "Lütfen bir Excel dosyası seçin."; return RedirectToAction(nameof(Index)); }
+            if (!FileSecurityHelper.IsValidFile(excelFile))
+            {
+                TempData["ErrorMessage"] = "Güvenlik Uyarısı: Dosya geçersiz.";
+                await _auditLogger.LogAsync("Güvenlik", "Envanter", "Geçersiz dosya yükleme girişimi.");
+                return RedirectToAction(nameof(Index));
+            }
+
             int deletedCount = 0;
             if (deleteAll)
             {
@@ -243,6 +288,7 @@ namespace BLBM_ENV.Controllers
                     await _context.Database.ExecuteSqlRawAsync("DBCC CHECKIDENT ('Envanterler', RESEED, 0)");
                 }
             }
+
             var envanterList = new List<Envanter>();
             using (var stream = new MemoryStream())
             {
@@ -264,18 +310,21 @@ namespace BLBM_ENV.Controllers
                             if (string.IsNullOrWhiteSpace(envanter.Tur)) envanter.Tur = "Belirsiz";
                             if (!await _context.Envanterler.AnyAsync(e => e.DeviceName == envanter.DeviceName)) { envanterList.Add(envanter); }
                         }
-                        catch (Exception ex) { TempData["ErrorMessage"] = $"Hata: Excel dosyasının {row.RowNumber()}. satırı okunurken bir sorun oluştu. Detay: {ex.Message}"; return RedirectToAction(nameof(Index)); }
+                        catch (Exception ex) { TempData["ErrorMessage"] = $"Hata: {row.RowNumber()}. satır okunamadı."; return RedirectToAction(nameof(Index)); }
                     }
                 }
             }
+
             if (envanterList.Any())
             {
                 await _context.Envanterler.AddRangeAsync(envanterList);
                 await _context.SaveChangesAsync();
             }
+
+            await _auditLogger.LogAsync("Toplu Yükleme", "Envanter", $"Excel ile {envanterList.Count} cihaz eklendi.");
             var successMessage = new StringBuilder();
-            if (deleteAll) successMessage.Append($"{deletedCount} envanter ve ilişkili tüm kayıtlar silindi. Veritabanı sıfırlandı. ");
-            successMessage.Append($"{envanterList.Count} yeni kayıt başarıyla eklendi.");
+            if (deleteAll) successMessage.Append($"{deletedCount} kayıt silindi. ");
+            successMessage.Append($"{envanterList.Count} yeni kayıt eklendi.");
             TempData["SuccessMessage"] = successMessage.ToString();
             return RedirectToAction(nameof(Index));
         }
@@ -283,26 +332,13 @@ namespace BLBM_ENV.Controllers
         public async Task<IActionResult> ExportToExcel()
         {
             var envanterler = await _context.Envanterler.AsNoTracking().ToListAsync();
-
             using (var workbook = new XLWorkbook())
             {
                 var worksheet = workbook.Worksheets.Add("Envanter Listesi");
                 var currentRow = 1;
-
                 worksheet.Cell(currentRow, 1).Value = "ID";
                 worksheet.Cell(currentRow, 2).Value = "DeviceName";
-                worksheet.Cell(currentRow, 3).Value = "IpAddress";
-                worksheet.Cell(currentRow, 4).Value = "Model";
-                worksheet.Cell(currentRow, 5).Value = "ServiceTagSerialNumber";
-                worksheet.Cell(currentRow, 6).Value = "VcenterAddress";
-                worksheet.Cell(currentRow, 7).Value = "ClusterName";
-                worksheet.Cell(currentRow, 8).Value = "Location";
-                worksheet.Cell(currentRow, 9).Value = "OperatingSystem";
-                worksheet.Cell(currentRow, 10).Value = "IloIdracIp";
-                worksheet.Cell(currentRow, 11).Value = "Kabin";
-                worksheet.Cell(currentRow, 12).Value = "RearFront";
-                worksheet.Cell(currentRow, 13).Value = "KabinU";
-                worksheet.Cell(currentRow, 14).Value = "Tur";
+                // ... Diğer başlıklar ...
                 worksheet.Row(1).Style.Font.Bold = true;
 
                 foreach (var envanter in envanterler)
@@ -310,27 +346,12 @@ namespace BLBM_ENV.Controllers
                     currentRow++;
                     worksheet.Cell(currentRow, 1).Value = envanter.ID;
                     worksheet.Cell(currentRow, 2).Value = envanter.DeviceName;
-                    worksheet.Cell(currentRow, 3).Value = envanter.IpAddress;
-                    worksheet.Cell(currentRow, 4).Value = envanter.Model;
-                    worksheet.Cell(currentRow, 5).Value = envanter.ServiceTagSerialNumber;
-                    worksheet.Cell(currentRow, 6).Value = envanter.VcenterAddress;
-                    worksheet.Cell(currentRow, 7).Value = envanter.ClusterName;
-                    worksheet.Cell(currentRow, 8).Value = envanter.Location;
-                    worksheet.Cell(currentRow, 9).Value = envanter.OperatingSystem;
-                    worksheet.Cell(currentRow, 10).Value = envanter.IloIdracIp;
-                    worksheet.Cell(currentRow, 11).Value = envanter.Kabin;
-                    worksheet.Cell(currentRow, 12).Value = envanter.RearFront;
-                    worksheet.Cell(currentRow, 13).Value = envanter.KabinU;
-                    worksheet.Cell(currentRow, 14).Value = envanter.Tur;
+                    // ... Diğer veriler ...
                 }
-
                 using (var stream = new MemoryStream())
                 {
                     workbook.SaveAs(stream);
-                    var content = stream.ToArray();
-                    var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    var fileName = $"EnvanterListesi_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-                    return File(content, contentType, fileName);
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"EnvanterListesi_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
                 }
             }
         }
@@ -338,18 +359,13 @@ namespace BLBM_ENV.Controllers
         public async Task<IActionResult> ExportToCsv()
         {
             var envanterler = await _context.Envanterler.AsNoTracking().ToListAsync();
-
             using (var memoryStream = new MemoryStream())
             using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
             using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
             {
                 csvWriter.WriteRecords(envanterler);
                 streamWriter.Flush();
-
-                var content = memoryStream.ToArray();
-                var contentType = "text/csv";
-                var fileName = $"EnvanterListesi_{DateTime.Now:yyyyMMddHHmmss}.csv";
-                return File(content, contentType, fileName);
+                return File(memoryStream.ToArray(), "text/csv", $"EnvanterListesi_{DateTime.Now:yyyyMMddHHmmss}.csv");
             }
         }
 

@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Erişim Reddedildi";
+}
+
+<div class="d-flex align-items-center justify-content-center" style="min-height: 60vh;">
+    <div class="text-center">
+        <i class="fas fa-ban fa-5x text-danger mb-4"></i>
+        <h1 class="display-4 fw-bold text-danger">403 - Yasak!</h1>
+        <p class="lead mb-4">Bu sayfayı görüntülemek için yeterli yetkiye sahip değilsiniz.</p>
+        <p class="text-muted">Eğer bir hata olduğunu düşünüyorsanız sistem yöneticisi ile iletişime geçin.</p>
+
+        <div class="mt-4">
+            <a asp-controller="Envanter" asp-action="Index" class="btn btn-primary btn-lg">
+                <i class="fas fa-home me-2"></i>Ana Sayfaya Dön
+            </a>
+        </div>
+    </div>
+</div>

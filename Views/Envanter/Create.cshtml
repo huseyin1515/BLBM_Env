@@ -1,92 +1,183 @@
 ﻿@model BLBM_ENV.Models.Envanter
 
 @{
-    ViewData["Title"] = "Yeni Envanter Cihazı Ekle";
+    ViewData["Title"] = "Yeni Cihaz Ekle";
+    var locationList = ViewBag.ExistingLocations as List<string> ?? new List<string>();
 }
 
-<h1>@ViewData["Title"]</h1>
-<hr />
+<!-- ÖZEL STİL: Dropdown'ın son elemanını yeşil yapmak için -->
+<style>
+    option.new-location-option {
+        background-color: #d1e7dd; /* Açık Yeşil */
+        color: #0f5132; /* Koyu Yeşil Yazı */
+        font-weight: bold;
+        padding: 10px;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
+        <p class="text-muted small">Sisteme yeni bir donanım ekleyin.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Listeye Geri Dön
+    </a>
+</div>
+
 <div class="row">
-    <div class="col-md-10">
+    <div class="col-lg-12">
         <form asp-action="Create">
-            <div asp-validation-summary="All" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-            <h4>Temel Bilgiler</h4>
-            <div class="row p-3 mb-3 border rounded">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="DeviceName" class="control-label fw-bold"></label>
-                    <input asp-for="DeviceName" class="form-control" />
-                    <span asp-validation-for="DeviceName" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Tur" class="control-label fw-bold"></label>
-                    <!-- GÜNCELLENDİ: Input yerine Select (Dropdown) kullanılıyor -->
-                    <select asp-for="Tur" class="form-select">
-                        <option value="">-- Bir tür seçin --</option>
-                        <option value="Server">Server</option>
-                        <option value="Storage">Storage</option>
-                        <option value="SAN Switch">SAN Switch</option>
-                        <option value="NW Switch">NW Switch</option>
-                    </select>
-                    <span asp-validation-for="Tur" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="ServiceTagSerialNumber" class="control-label"></label>
-                    <input asp-for="ServiceTagSerialNumber" class="form-control" />
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Model" class="control-label"></label>
-                    <input asp-for="Model" class="form-control" />
-                </div>
-            </div>
+            <!-- ASIL VERİYİ TAŞIYAN GİZLİ INPUT (Bu veritabanına gider) -->
+            <input type="hidden" id="RealLocationInput" name="Location" />
 
-            <h4>Ağ ve Sanallaştırma Bilgileri</h4>
-            <div class="row p-3 mb-3 border rounded">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="IpAddress" class="control-label"></label>
-                    <input asp-for="IpAddress" class="form-control" />
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-success text-white">
+                    <h6 class="m-0 font-weight-bold"><i class="fas fa-plus-circle me-2"></i>Cihaz Bilgileri</h6>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="IloIdracIp" class="control-label"></label>
-                    <input asp-for="IloIdracIp" class="form-control" />
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="VcenterAddress" class="control-label"></label>
-                    <input asp-for="VcenterAddress" class="form-control" />
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="ClusterName" class="control-label"></label>
-                    <input asp-for="ClusterName" class="form-control" />
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="OperatingSystem" class="control-label"></label>
-                    <input asp-for="OperatingSystem" class="form-control" />
-                </div>
-            </div>
+                <div class="card-body">
 
-            <h4>Fiziksel Konum Bilgileri</h4>
-            <div class="row p-3 mb-3 border rounded">
-                <div class="col-md-12 mb-3">
-                    <label asp-for="Location" class="control-label"></label>
-                    <input asp-for="Location" class="form-control" />
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label asp-for="Kabin" class="control-label"></label>
-                    <input asp-for="Kabin" class="form-control" />
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label asp-for="RearFront" class="control-label"></label>
-                    <input asp-for="RearFront" class="form-control" placeholder="Rear / Front" />
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label asp-for="KabinU" class="control-label"></label>
-                    <input asp-for="KabinU" class="form-control" />
-                </div>
-            </div>
+                    <!-- 1. GRUP: TEMEL BİLGİLER -->
+                    <h5 class="text-primary mb-3 border-bottom pb-2">Temel Bilgiler</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="DeviceName" class="form-control" placeholder="Cihaz Adı" />
+                                <label asp-for="DeviceName">Cihaz Adı</label>
+                                <span asp-validation-for="DeviceName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select asp-for="Tur" class="form-select">
+                                    <option value="">Seçiniz...</option>
+                                    <option value="Server">Server</option>
+                                    <option value="Storage">Storage</option>
+                                    <option value="SAN Switch">SAN Switch</option>
+                                    <option value="NW Switch">NW Switch</option>
+                                    <option value="Firewall">Firewall</option>
+                                    <option value="Load Balancer">Load Balancer</option>
+                                    <option value="Tape Library">Tape Library</option>
+                                    <option value="Other">Diğer</option>
+                                </select>
+                                <label asp-for="Tur">Cihaz Türü</label>
+                                <span asp-validation-for="Tur" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="ServiceTagSerialNumber" class="form-control" placeholder="Seri No" />
+                                <label asp-for="ServiceTagSerialNumber">Servis Etiketi / Seri No</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Model" class="form-control" placeholder="Model" />
+                                <label asp-for="Model">Model</label>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="form-group mt-4">
-                <input type="submit" value="Oluştur" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+                    <!-- 2. GRUP: AĞ VE SANALLAŞTIRMA -->
+                    <h5 class="text-success mb-3 border-bottom pb-2 mt-4">Ağ ve Sistem</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="IpAddress" class="form-control" placeholder="Yönetim IP" />
+                                <label asp-for="IpAddress">Yönetim IP Adresi</label>
+                                <span asp-validation-for="IpAddress" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="IloIdracIp" class="form-control" placeholder="ILO IP" />
+                                <label asp-for="IloIdracIp">ILO / iDRAC IP</label>
+                                <span asp-validation-for="IloIdracIp" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input asp-for="VcenterAddress" class="form-control" placeholder="VCenter" />
+                                <label asp-for="VcenterAddress">VCenter Adresi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input asp-for="ClusterName" class="form-control" placeholder="Cluster" />
+                                <label asp-for="ClusterName">Cluster Adı</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input asp-for="OperatingSystem" class="form-control" placeholder="OS" />
+                                <label asp-for="OperatingSystem">İşletim Sistemi</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. GRUP: FİZİKSEL KONUM (HİBRİT YAPI) -->
+                    <h5 class="text-info mb-3 border-bottom pb-2 mt-4">Fiziksel Konum</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+
+                            <!-- MOD 1: LİSTE SEÇİMİ -->
+                            <div class="form-floating" id="ModeSelect">
+                                <select id="UiLocationSelect" class="form-select">
+                                    <option value="">-- Lokasyon Seçiniz --</option>
+                                    @foreach (var loc in locationList)
+                                    {
+                                        <option value="@loc">@loc</option>
+                                    }
+                                    <!-- SİHİRLİ SEÇENEK -->
+                                    <option value="__NEW__" class="new-location-option">+ Yeni Lokasyon Ekle...</option>
+                                </select>
+                                <label for="UiLocationSelect">Lokasyon</label>
+                            </div>
+
+                            <!-- MOD 2: MANUEL YAZMA -->
+                            <div class="input-group" id="ModeInput" style="display:none">
+                                <div class="form-floating flex-grow-1">
+                                    <input type="text" id="UiLocationText" class="form-control" placeholder="Yeni Lokasyon Yazın" />
+                                    <label for="UiLocationText">Yeni Lokasyon Yazınız</label>
+                                </div>
+                                <button type="button" class="btn btn-outline-danger" id="btnCancelNew" title="Listeye Dön">
+                                    <i class="fas fa-times"></i> İptal
+                                </button>
+                            </div>
+
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-floating">
+                                <input asp-for="Kabin" class="form-control" placeholder="Kabin" />
+                                <label asp-for="Kabin">Kabin (A1)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-floating">
+                                <select asp-for="RearFront" class="form-select">
+                                    <option value="">Seçiniz...</option>
+                                    <option value="Front">Front (Ön)</option>
+                                    <option value="Rear">Rear (Arka)</option>
+                                </select>
+                                <label asp-for="RearFront">Yön</label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-floating">
+                                <input asp-for="KabinU" class="form-control" placeholder="U" />
+                                <label asp-for="KabinU">U Yüksekliği (42)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer text-end">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-save me-1"></i> Cihazı Oluştur
+                    </button>
+                </div>
             </div>
         </form>
     </div>
@@ -96,4 +187,51 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        $(document).ready(function () {
+
+            var realInput = $('#RealLocationInput');
+            var selectMode = $('#ModeSelect');
+            var inputMode = $('#ModeInput');
+            var uiSelect = $('#UiLocationSelect');
+            var uiText = $('#UiLocationText');
+            var btnCancel = $('#btnCancelNew');
+
+            // 1. Select Değiştiğinde
+            uiSelect.on('change', function() {
+                var val = $(this).val();
+                if (val === '__NEW__') {
+                    selectMode.hide();
+                    inputMode.fadeIn();
+                    uiText.val('').focus();
+                    realInput.val('');
+                } else {
+                    realInput.val(val);
+                }
+            });
+
+            // 2. Text Input Değiştiğinde
+            uiText.on('input', function() {
+                realInput.val($(this).val());
+            });
+
+            // 3. İptal
+            btnCancel.on('click', function() {
+                inputMode.hide();
+                selectMode.fadeIn();
+                uiSelect.val('');
+                realInput.val('');
+            });
+
+            // Kaydet Animasyonu
+            $('form').on('submit', function() {
+                if ($(this).valid()) {
+                    var btn = $(this).find('button[type="submit"]');
+                    btn.prop('disabled', true);
+                    btn.html('<i class="fas fa-spinner fa-spin me-2"></i> Kaydediliyor...');
+                }
+            });
+        });
+    </script>
 }

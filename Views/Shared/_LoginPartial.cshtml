@@ -1,0 +1,52 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using BLBM_ENV.Models
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var user = await UserManager.GetUserAsync(User);
+        var displayName = (!string.IsNullOrEmpty(user?.FullName)) ? user.FullName : UserManager.GetUserName(User);
+
+        <li class="nav-item">
+            <a id="manage" class="nav-link text-light" asp-controller="Account" asp-action="Manage" title="Profilimi Yönet">
+                <i class="fas fa-user-circle me-1"></i> Merhaba, @displayName!
+            </a>
+        </li>
+        <li class="nav-item">
+            <form id="logoutForm" class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
+                <button id="logout" type="button" onclick="confirmLogout()" class="nav-link btn btn-link text-light border-0">Çıkış Yap</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-light" id="register" asp-controller="Account" asp-action="Register">Kayıt Ol</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-light" id="login" asp-controller="Account" asp-action="Login">Giriş Yap</a>
+        </li>
+    }
+</ul>
+
+<script>
+    function confirmLogout() {
+        Swal.fire({
+            title: 'Çıkış Yapılıyor',
+            text: "Oturumunuzu kapatmak istediğinize emin misiniz?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Evet, Çıkış Yap',
+            cancelButtonText: 'İptal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('logoutForm').submit();
+            }
+        })
+    }
+</script>

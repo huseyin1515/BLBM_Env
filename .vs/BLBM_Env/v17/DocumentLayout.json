@@ -1,42 +1,34 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\",
+  "WorkspaceRootPath": "C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\migrations\\20251015222230_initialschema.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:migrations\\20251015222230_initialschema.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\FinalDatabaseSetup.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:FinalDatabaseSetup.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\models\\vip.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:models\\vip.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\Migrations\\20251130211728_FinalStableSchema.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20251130211728_FinalStableSchema.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\models\\baglanti.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:models\\baglanti.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\xpotica\\source\\repos\\blbm_env\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\models\\envanter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:models\\envanter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\Migrations\\20251130204026_CascadeDelete.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20251130204026_CascadeDelete.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\views\\envanter\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:views\\envanter\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\xpotica\\source\\repos\\blbm_env\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\controllers\\vipcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:controllers\\vipcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\xpotica\\source\\repos\\blbm_env\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\controllers\\envantercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:controllers\\envantercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\models\\unifiedportviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:models\\unifiedportviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|c:\\users\\husey\\source\\repos\\blbm_env\\views\\baglanti\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{C3DB1916-0698-432B-BEEF-2A694DAA9E86}|BLBM_Env.csproj|solutionrelative:views\\baglanti\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\FinalDatabaseSetup.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:FinalDatabaseSetup.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame"
     }
   ],
   "DocumentGroupContainers": [
@@ -55,119 +47,86 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "20251015222230_InitialSchema.cs",
-              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Migrations\\20251015222230_InitialSchema.cs",
-              "RelativeDocumentMoniker": "Migrations\\20251015222230_InitialSchema.cs",
-              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Migrations\\20251015222230_InitialSchema.cs",
-              "RelativeToolTip": "Migrations\\20251015222230_InitialSchema.cs",
-              "ViewState": "AgIAAB0AAAAAAAAAAAAAAGMAAAApAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T22:22:30.619Z",
+              "Title": "FinalDatabaseSetup.sql ",
+              "DocumentMoniker": "C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\FinalDatabaseSetup.sql",
+              "RelativeDocumentMoniker": "FinalDatabaseSetup.sql",
+              "ToolTip": "FinalDatabaseSetup.sql ",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-30T21:18:12.539Z",
               "EditorCaption": ""
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "20251130211728_FinalStableSchema.cs",
+              "DocumentMoniker": "C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\Migrations\\20251130211728_FinalStableSchema.cs",
+              "RelativeDocumentMoniker": "Migrations\\20251130211728_FinalStableSchema.cs",
+              "ToolTip": "C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\Migrations\\20251130211728_FinalStableSchema.cs",
+              "RelativeToolTip": "Migrations\\20251130211728_FinalStableSchema.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-30T21:17:29.049Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "Data\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAADIAAAAAAAAAAAAswFgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-30T21:13:29.693Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "20251130204026_CascadeDelete.cs",
+              "DocumentMoniker": "C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\Migrations\\20251130204026_CascadeDelete.cs",
+              "RelativeDocumentMoniker": "Migrations\\20251130204026_CascadeDelete.cs",
+              "ToolTip": "C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\Migrations\\20251130204026_CascadeDelete.cs",
+              "RelativeToolTip": "Migrations\\20251130204026_CascadeDelete.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-30T20:40:26.511Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AdminController.cs",
+              "DocumentMoniker": "C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\Controllers\\AdminController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AdminController.cs",
+              "ToolTip": "C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\Controllers\\AdminController.cs",
+              "RelativeToolTip": "Controllers\\AdminController.cs",
+              "ViewState": "AgIAAHEAAAAAAAAAAAAswJcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-30T20:40:07.924Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AccountController.cs",
+              "ToolTip": "C:\\Users\\Xpotica\\source\\repos\\BLBM_Env\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "Controllers\\AccountController.cs",
+              "ViewState": "AgIAAGgAAAAAAAAAAAAswHoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-30T20:39:58.596Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Vip.cs",
-              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Models\\Vip.cs",
-              "RelativeDocumentMoniker": "Models\\Vip.cs",
-              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Models\\Vip.cs",
-              "RelativeToolTip": "Models\\Vip.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACcAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T22:10:15.934Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Baglanti.cs",
-              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Models\\Baglanti.cs",
-              "RelativeDocumentMoniker": "Models\\Baglanti.cs",
-              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Models\\Baglanti.cs",
-              "RelativeToolTip": "Models\\Baglanti.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAywD8AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T22:10:01.94Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Envanter.cs",
-              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Models\\Envanter.cs",
-              "RelativeDocumentMoniker": "Models\\Envanter.cs",
-              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Models\\Envanter.cs",
-              "RelativeToolTip": "Models\\Envanter.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAAAowCIAAAAtAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T22:09:22.52Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "UnifiedPortViewModel.cs",
-              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Models\\UnifiedPortViewModel.cs",
-              "RelativeDocumentMoniker": "Models\\UnifiedPortViewModel.cs",
-              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Models\\UnifiedPortViewModel.cs",
-              "RelativeToolTip": "Models\\UnifiedPortViewModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-11T10:38:44.776Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "EnvanterController.cs",
-              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Controllers\\EnvanterController.cs",
-              "RelativeDocumentMoniker": "Controllers\\EnvanterController.cs",
-              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Controllers\\EnvanterController.cs",
-              "RelativeToolTip": "Controllers\\EnvanterController.cs",
-              "ViewState": "AgIAADYBAAAAAAAAAAAYwGgBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-11T10:01:19.328Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "VipController.cs",
-              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Controllers\\VipController.cs",
-              "RelativeDocumentMoniker": "Controllers\\VipController.cs",
-              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Controllers\\VipController.cs",
-              "RelativeToolTip": "Controllers\\VipController.cs",
-              "ViewState": "AgIAANwAAAAAAAAAAAAAAA0BAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-09T11:41:01.091Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Details.cshtml",
-              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Views\\Envanter\\Details.cshtml",
-              "RelativeDocumentMoniker": "Views\\Envanter\\Details.cshtml",
-              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Views\\Envanter\\Details.cshtml",
-              "RelativeToolTip": "Views\\Envanter\\Details.cshtml",
-              "ViewState": "AgIAAJMAAAAAAAAAAAAAAFYBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-09T11:25:24.358Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Views\\Baglanti\\Index.cshtml",
-              "RelativeDocumentMoniker": "Views\\Baglanti\\Index.cshtml",
-              "ToolTip": "C:\\Users\\husey\\source\\repos\\BLBM_Env\\Views\\Baglanti\\Index.cshtml",
-              "RelativeToolTip": "Views\\Baglanti\\Index.cshtml",
-              "ViewState": "AgIAAPIAAAAAAAAAAADwvyMBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-09T11:12:46.309Z"
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
             }
           ]
         }

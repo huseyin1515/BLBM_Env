@@ -1,0 +1,86 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using BLBM_ENV.Models
+@inject UserManager<ApplicationUser> UserManager
+@model ChangePasswordViewModel
+
+@{
+    ViewData["Title"] = "Profilim";
+    var user = await UserManager.GetUserAsync(User);
+}
+
+<div class="container py-4">
+    <div class="row">
+        <!-- Sol Taraf: Kullanıcı Bilgi Kartı -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h4 class="card-title">@(string.IsNullOrEmpty(user.FullName) ? user.UserName : user.FullName)</h4>
+                    <p class="text-muted">@user.Email</p>
+
+                    <div class="mt-2">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <span class="badge bg-danger">Yönetici</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Kullanıcı</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ Taraf: Şifre Değiştirme Formu -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-key me-2"></i>Şifre Değiştir</h5>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="ChangePassword" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="CurrentPassword" class="form-control" placeholder="Mevcut Şifre" />
+                            <label asp-for="CurrentPassword"></label>
+                            <span asp-validation-for="CurrentPassword" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="NewPassword" class="form-control" placeholder="Yeni Şifre" />
+                            <label asp-for="NewPassword"></label>
+                            <span asp-validation-for="NewPassword" class="text-danger"></span>
+                            <small class="text-muted">En az 6 karakter, büyük/küçük harf ve rakam içermelidir.</small>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Şifreyi Onayla" />
+                            <label asp-for="ConfirmPassword"></label>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Şifreyi Güncelle</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

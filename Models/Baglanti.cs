@@ -11,47 +11,43 @@ namespace BLBM_ENV.Models
         public int? SourceDeviceID { get; set; }
         public int? TargetDeviceID { get; set; }
 
-        [StringLength(100)]
+        [StringLength(50)]
         public string Source_Port { get; set; } = string.Empty;
 
-        [StringLength(50)]
+        [StringLength(20)]
         public string? Source_LinkStatus { get; set; }
 
-        [StringLength(50)]
+        [StringLength(20)]
         public string? Source_LinkSpeed { get; set; }
 
-        [StringLength(100)]
+        [StringLength(50)]
         public string? Source_NicID { get; set; }
 
-        [StringLength(50)]
+        [StringLength(30)]
         public string? Source_FiberMAC { get; set; }
 
-        [StringLength(50)]
+        [StringLength(30)]
         public string? Source_BakirMAC { get; set; }
 
-        [StringLength(50)]
+        // --- GÜNCELLENDİ: 25 -> 60 yapıldı (Notlar sığsın diye) ---
+        [StringLength(60)]
         public string? Source_WWPN { get; set; }
 
-        [StringLength(100)]
-        public string Target_Port { get; set; } = string.Empty;
+        // --- HEDEF ---
+        [StringLength(50)] public string Target_Port { get; set; } = string.Empty;
+        [StringLength(20)] public string? Target_LinkStatus { get; set; }
+        [StringLength(20)] public string? Target_LinkSpeed { get; set; }
+        [StringLength(30)] public string? Target_FiberMAC { get; set; }
+        [StringLength(30)] public string? Target_BakirMAC { get; set; }
+
+        // --- GÜNCELLENDİ: 25 -> 60 yapıldı ---
+        [StringLength(60)] public string? Target_WWPN { get; set; }
 
         [StringLength(50)]
-        public string? Target_LinkStatus { get; set; }
-
-        [StringLength(50)]
-        public string? Target_LinkSpeed { get; set; }
-
-        [StringLength(50)]
-        public string? Target_FiberMAC { get; set; }
-
-        [StringLength(50)]
-        public string? Target_BakirMAC { get; set; }
-
-        [StringLength(50)]
-        public string? Target_WWPN { get; set; }
-
-        [StringLength(100)]
         public string? ConnectionType { get; set; }
+
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
 
         [ForeignKey("SourceDeviceID")]
         [InverseProperty("AsSourceConnections")]

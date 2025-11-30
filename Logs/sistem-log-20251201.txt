@@ -1,0 +1,2 @@
+2025-12-01 00:13:53.381 +03:00 [ERR] Failed executing DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+ALTER TABLE [Baglantilar] ADD CONSTRAINT [FK_Baglantilar_Envanterler_TargetDeviceID] FOREIGN KEY ([TargetDeviceID]) REFERENCES [Envanterler] ([ID]) ON DELETE CASCADE;

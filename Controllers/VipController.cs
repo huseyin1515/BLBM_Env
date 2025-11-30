@@ -1,26 +1,57 @@
 ﻿using BLBM_ENV.Data;
 using BLBM_ENV.Models;
+using BLBM_ENV.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ClosedXML.Excel;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using CsvHelper;
 using System.Globalization;
+using System.Net;
+using System.Net.Sockets;
+using System.Collections.Concurrent;
 using System.Text;
+using System.Diagnostics;
+using System.Text.RegularExpressions; // --- DÜZELTME: Bu kütüphane eklendi ---
 
 namespace BLBM_ENV.Controllers
 {
-    public class HostResolveResult { public bool Success { get; set; } public string? IpAddress { get; set; } }
-    public class VipDetailDto { public string? MakineAdi { get; set; } public string? Durumu { get; set; } public string? Network { get; set; } public string? Cluster { get; set; } public string? Host { get; set; } public string? OS { get; set; } }
+    [Authorize]
+    public class HostResolveResult
+    {
+        public bool Success { get; set; }
+        public string? IpAddress { get; set; }
+    }
 
+    public class VipDetailDto
+    {
+        public string? MakineAdi { get; set; }
+        public string? Durumu { get; set; }
+        public string? Network { get; set; }
+        public string? Cluster { get; set; }
+        public string? Host { get; set; }
+        public string? OS { get; set; }
+    }
+
+    public class RawVipData
+    {
+        public int RowNumber { get; set; }
+        public string RawInput { get; set; } = string.Empty;
+    }
+
+    [Authorize]
     public class VipController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IAuditLogger _auditLogger;
 
-        public VipController(ApplicationDbContext context)
+        // --- AYAR: Şirket Domain Uzantıları ---
+        private readonly string[] _domainSuffixes = { ".belbim.local", ".local", ".belbim.com.tr" };
+
+        public VipController(ApplicationDbContext context, IAuditLogger auditLogger)
         {
             _context = context;
+            _auditLogger = auditLogger;
         }
 
         public async Task<IActionResult> Index()
@@ -89,10 +120,23 @@ namespace BLBM_ENV.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ImportStandardExcel(IFormFile excelFile, bool deleteAll)
         {
+            if (!FileSecurityHelper.IsValidFile(excelFile))
+            {
+                TempData["ErrorMessage"] = "Güvenlik Uyarısı: Dosya geçersiz.";
+                await _auditLogger.LogAsync("Güvenlik", "VIP", "Geçersiz dosya yükleme girişimi.");
+                return RedirectToAction(nameof(Index));
+            }
+
             if (excelFile == null || excelFile.Length == 0) { TempData["ErrorMessage"] = "Lütfen bir dosya seçin."; return RedirectToAction(nameof(Index)); }
-            if (deleteAll) { await _context.Database.ExecuteSqlRawAsync("DELETE FROM [Vips]"); }
+
+            int deletedCount = 0;
+            if (deleteAll)
+            {
+                deletedCount = await _context.Database.ExecuteSqlRawAsync("DELETE FROM [Vips]");
+            }
 
             var vipsToAdd = new List<Vip>();
             var extension = Path.GetExtension(excelFile.FileName).ToLower();
@@ -125,71 +169,135 @@ namespace BLBM_ENV.Controllers
                         vipsToAdd.AddRange(records);
                     }
                 }
-                else
-                {
-                    TempData["ErrorMessage"] = "Desteklenmeyen dosya formatı. Lütfen .xlsx veya .csv uzantılı bir dosya yükleyin.";
-                    return RedirectToAction(nameof(Index));
-                }
             }
-            if (vipsToAdd.Any()) { await _context.Vips.AddRangeAsync(vipsToAdd); await _context.SaveChangesAsync(); TempData["SuccessMessage"] = $"{vipsToAdd.Count} adet VIP kaydı başarıyla yüklendi."; }
+            if (vipsToAdd.Any())
+            {
+                await _context.Vips.AddRangeAsync(vipsToAdd);
+                await _context.SaveChangesAsync();
+                await _auditLogger.LogAsync("Toplu Yükleme", "VIP", $"Standart Excel ile {vipsToAdd.Count} VIP eklendi. (Silinen: {deletedCount})");
+                TempData["SuccessMessage"] = $"{vipsToAdd.Count} adet VIP kaydı başarıyla yüklendi.";
+            }
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ImportAndResolveFromExcel(IFormFile excelFile, bool deleteAll)
         {
-            if (excelFile == null || excelFile.Length == 0) { TempData["ErrorMessage"] = "Lütfen bir dosya seçin."; return RedirectToAction(nameof(Index)); }
-            if (deleteAll) { await _context.Database.ExecuteSqlRawAsync("DELETE FROM [Vips]"); }
-            var vipsToAdd = new List<Vip>();
-            var errorList = new List<string>();
+            if (!FileSecurityHelper.IsValidFile(excelFile))
+            {
+                TempData["ErrorMessage"] = "Güvenlik Uyarısı: Dosya geçersiz.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var rawDataList = new List<RawVipData>();
             using (var stream = new MemoryStream())
             {
                 await excelFile.CopyToAsync(stream);
                 using (var workbook = new XLWorkbook(stream))
                 {
                     var worksheet = workbook.Worksheets.FirstOrDefault();
-                    if (worksheet == null) { TempData["ErrorMessage"] = "Excel'de sayfa bulunamadı."; return RedirectToAction(nameof(Index)); }
+                    if (worksheet == null) { TempData["ErrorMessage"] = "Sayfa bulunamadı."; return RedirectToAction(nameof(Index)); }
+
                     var rows = worksheet.RowsUsed().Skip(1);
                     foreach (var row in rows)
                     {
-                        try
+                        rawDataList.Add(new RawVipData
                         {
-                            string rawData = row.Cell(1).Value.ToString().Trim();
-                            if (string.IsNullOrEmpty(rawData)) continue;
-                            string[] mainParts = rawData.Split(new[] { ' ', '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
-                            if (mainParts.Length < 2) { errorList.Add($"Satır {row.RowNumber()}: '{rawData}' formatı hatalı."); continue; }
-                            string dnsPart = mainParts[0];
-                            string machinePart = mainParts[1];
-                            string dnsName = dnsPart;
-                            string? port = null;
-                            if (dnsName.StartsWith("pool_")) { dnsName = dnsName.Substring(5); }
-                            int lastUnderscore = dnsName.LastIndexOf('_');
-                            if (lastUnderscore > 0 && int.TryParse(dnsName.Substring(lastUnderscore + 1), out _))
-                            {
-                                port = dnsName.Substring(lastUnderscore + 1);
-                                dnsName = dnsName.Substring(0, lastUnderscore);
-                            }
-                            string machineIp = machinePart;
-                            if (machinePart.Contains(':')) { machineIp = machinePart.Split(':')[0]; }
-                            if (machineIp.StartsWith("DRC_")) { machineIp = machineIp.Substring(4); }
-                            HostResolveResult result = await ResolveHostAsync(dnsName);
-                            vipsToAdd.Add(new Vip { Dns = dnsName, VipIp = result.IpAddress, Port = port, MakineIp = machineIp, Durumu = result.Success ? "Up" : "Down", MakineAdi = null, Network = null, Cluster = null, Host = null, OS = null });
-                        }
-                        catch (Exception ex) { errorList.Add($"Satır {row.RowNumber()}: İşlenirken hata - {ex.Message}"); }
+                            RowNumber = row.RowNumber(),
+                            RawInput = row.Cell(1).Value.ToString().Trim()
+                        });
                     }
                 }
             }
-            if (vipsToAdd.Any()) { await _context.Vips.AddRangeAsync(vipsToAdd); await _context.SaveChangesAsync(); TempData["SuccessMessage"] = $"{vipsToAdd.Count} adet VIP kaydı Oto-DNS ile işlendi."; }
-            if (errorList.Any()) { TempData["ErrorMessage"] = string.Join("<br/>", errorList); }
+
+            if (deleteAll)
+            {
+                await _context.Database.ExecuteSqlRawAsync("DELETE FROM [Vips]");
+            }
+
+            var vipsToAdd = new ConcurrentBag<Vip>();
+            var errorList = new ConcurrentBag<string>();
+            var semaphore = new SemaphoreSlim(20);
+
+            var tasks = rawDataList.Select(async item =>
+            {
+                await semaphore.WaitAsync();
+                try
+                {
+                    if (string.IsNullOrEmpty(item.RawInput)) return;
+
+                    string[] mainParts = item.RawInput.Split(new[] { ' ', '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                    if (mainParts.Length < 2)
+                    {
+                        errorList.Add($"Satır {item.RowNumber}: Format hatalı.");
+                        return;
+                    }
+
+                    string dnsName = mainParts[0];
+                    string machinePart = mainParts[1];
+                    string? port = null;
+
+                    if (dnsName.StartsWith("pool_")) { dnsName = dnsName.Substring(5); }
+                    int lastUnderscore = dnsName.LastIndexOf('_');
+                    if (lastUnderscore > 0 && int.TryParse(dnsName.Substring(lastUnderscore + 1), out _))
+                    {
+                        port = dnsName.Substring(lastUnderscore + 1);
+                        dnsName = dnsName.Substring(0, lastUnderscore);
+                    }
+
+                    string machineIp = machinePart;
+                    if (machinePart.Contains(':')) { machineIp = machinePart.Split(':')[0]; }
+                    if (machineIp.StartsWith("DRC_")) { machineIp = machineIp.Substring(4); }
+
+                    // Akıllı Çözümleme
+                    HostResolveResult result = await ResolveHostSmartAsync(dnsName);
+
+                    vipsToAdd.Add(new Vip
+                    {
+                        Dns = dnsName,
+                        VipIp = result.IpAddress,
+                        Port = port,
+                        MakineIp = machineIp,
+                        Durumu = result.Success ? "Up" : "Down"
+                    });
+                }
+                catch (Exception ex)
+                {
+                    errorList.Add($"Satır {item.RowNumber}: Hata - {ex.Message}");
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            });
+
+            await Task.WhenAll(tasks);
+
+            if (!vipsToAdd.IsEmpty)
+            {
+                await _context.Vips.AddRangeAsync(vipsToAdd);
+                await _context.SaveChangesAsync();
+                await _auditLogger.LogAsync("DNS Çözümleme", "VIP", $"Akıllı DNS Resolver ile {vipsToAdd.Count} VIP eklendi.");
+                TempData["SuccessMessage"] = $"{vipsToAdd.Count} adet VIP kaydı işlendi.";
+            }
+
+            if (!errorList.IsEmpty)
+            {
+                TempData["ErrorMessage"] = string.Join("<br/>", errorList.Take(20));
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateVipsFromDetailExcel(IFormFile excelFile)
         {
-            if (excelFile == null || excelFile.Length == 0) { TempData["ErrorMessage"] = "Lütfen bir detay Excel dosyası seçin."; return RedirectToAction(nameof(Index)); }
+            if (excelFile == null || excelFile.Length == 0) { TempData["ErrorMessage"] = "Lütfen dosya seçin."; return RedirectToAction(nameof(Index)); }
+
             var excelData = new Dictionary<string, VipDetailDto>();
             using (var stream = new MemoryStream())
             {
@@ -197,11 +305,11 @@ namespace BLBM_ENV.Controllers
                 using (var workbook = new XLWorkbook(stream))
                 {
                     var worksheet = workbook.Worksheets.FirstOrDefault();
-                    if (worksheet == null) { TempData["ErrorMessage"] = "Detay Excel'de sayfa bulunamadı."; return RedirectToAction(nameof(Index)); }
+                    if (worksheet == null) { TempData["ErrorMessage"] = "Sayfa bulunamadı."; return RedirectToAction(nameof(Index)); }
                     var headerRow = worksheet.Row(1);
                     var headerMap = new Dictionary<string, int>();
                     foreach (var cell in headerRow.CellsUsed()) { headerMap[cell.Value.ToString().Trim()] = cell.Address.ColumnNumber; }
-                    if (!headerMap.ContainsKey("Primary IP Address")) { TempData["ErrorMessage"] = "Excel'de 'Primary IP Address' sütunu bulunamadı."; return RedirectToAction(nameof(Index)); }
+                    if (!headerMap.ContainsKey("Primary IP Address")) { TempData["ErrorMessage"] = "'Primary IP Address' sütunu bulunamadı."; return RedirectToAction(nameof(Index)); }
                     var rows = worksheet.RowsUsed().Skip(1);
                     foreach (var row in rows)
                     {
@@ -240,7 +348,8 @@ namespace BLBM_ENV.Controllers
             if (updatedCount > 0 || unmatchedCount > 0)
             {
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"{updatedCount} adet VIP kaydı güncellendi. {unmatchedCount} adet eşleşmeyen kaydın durumu '-' olarak ayarlandı.";
+                await _auditLogger.LogAsync("Zenginleştirme", "VIP", $"{updatedCount} VIP güncellendi.");
+                TempData["SuccessMessage"] = $"{updatedCount} VIP güncellendi.";
             }
             else
             {
@@ -249,22 +358,77 @@ namespace BLBM_ENV.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task<HostResolveResult> ResolveHostAsync(string hostName)
+        // --- AKILLI ÇÖZÜMLEME ---
+        private async Task<HostResolveResult> ResolveHostSmartAsync(string hostName)
+        {
+            var result = await TryResolveNative(hostName);
+            if (result.Success) return result;
+
+            if (!hostName.Contains('.'))
+            {
+                foreach (var suffix in _domainSuffixes)
+                {
+                    var suffixResult = await TryResolveNative(hostName + suffix);
+                    if (suffixResult.Success) return suffixResult;
+                }
+            }
+
+            return await TryResolveNslookup(hostName);
+        }
+
+        private async Task<HostResolveResult> TryResolveNative(string host)
         {
             try
             {
-                var process = new Process { StartInfo = new ProcessStartInfo { FileName = "nslookup.exe", Arguments = hostName, RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true, } };
+                var entry = await Dns.GetHostEntryAsync(host);
+                var ipv4 = entry.AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
+                if (ipv4 != null) return new HostResolveResult { Success = true, IpAddress = ipv4.ToString() };
+
+                var anyIp = entry.AddressList.FirstOrDefault();
+                return new HostResolveResult { Success = (anyIp != null), IpAddress = anyIp?.ToString() ?? "Çözümlenemedi" };
+            }
+            catch
+            {
+                return new HostResolveResult { Success = false, IpAddress = null };
+            }
+        }
+
+        private async Task<HostResolveResult> TryResolveNslookup(string hostName)
+        {
+            try
+            {
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "nslookup.exe",
+                        Arguments = hostName,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
                 process.Start();
                 string output = await process.StandardOutput.ReadToEndAsync();
                 await process.WaitForExitAsync();
+
                 var matches = Regex.Matches(output, @"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b");
-                string? ip = "Çözümlenemedi";
-                bool success = false;
-                if (matches.Count > 1) { ip = matches.LastOrDefault()?.Value; success = ip != null; }
-                else if (matches.Count == 1) { ip = matches.FirstOrDefault()?.Value; success = ip != null; }
-                return new HostResolveResult { Success = success, IpAddress = ip ?? "Çözümlenemedi" };
+
+                if (matches.Count > 1)
+                {
+                    return new HostResolveResult { Success = true, IpAddress = matches.LastOrDefault()?.Value };
+                }
+                else if (matches.Count == 1)
+                {
+                    return new HostResolveResult { Success = true, IpAddress = matches.FirstOrDefault()?.Value };
+                }
+
+                return new HostResolveResult { Success = false, IpAddress = "Çözümlenemedi" };
             }
-            catch { return new HostResolveResult { Success = false, IpAddress = "DNS Hatası" }; }
+            catch
+            {
+                return new HostResolveResult { Success = false, IpAddress = "DNS Hatası" };
+            }
         }
     }
 }

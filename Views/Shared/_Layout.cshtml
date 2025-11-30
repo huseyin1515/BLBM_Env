@@ -15,7 +15,6 @@
 </head>
 <body>
     <header>
-        <!-- GÜNCELLENDİ: Navbar'a 'fixed-top' sınıfı eklendi -->
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow fixed-top">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-controller="Envanter" asp-action="Index">
@@ -40,13 +39,23 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Kabin" asp-action="Index"><i class="fas fa-fw fa-sitemap me-2"></i>Kabin Görünümü</a>
                         </li>
+                        <!-- YENİ EKLENDİ: Sadece Admin'in görebileceği Kullanıcı Yönetimi linki -->
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Admin" asp-action="Index"><i class="fas fa-fw fa-users-cog me-2"></i>Kullanıcı Yönetimi</a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Admin" asp-action="AuditLogs"><i class="fas fa-history me-2"></i>İşlem Geçmişi</a>
+                        </li>
                     </ul>
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
 
-    <!-- GÜNCELLENDİ: Ana içerik alanı artık bir container içinde -->
     <div class="container-fluid">
         <main role="main" class="pb-3">
             @RenderBody()
